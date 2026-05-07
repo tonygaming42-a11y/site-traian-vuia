@@ -1,9 +1,7 @@
 (function () {
-  let threeSceneInitialized = false;
-
   function initThreeSceneOnLoad() {
-    if (threeSceneInitialized || typeof window.initThreeScene !== 'function') return;
-    threeSceneInitialized = Boolean(window.initThreeScene());
+    if (window.__threeSceneInitialized || typeof window.initThreeScene !== 'function') return;
+    window.initThreeScene();
   }
 
   function initMenu() {
