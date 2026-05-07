@@ -16,7 +16,7 @@
     const trail = [];
     let startTime = null;
     let lastCanvasOpacity = 1;
-    let lastTrailEmission = 0;
+    let lastTrailEmissionTime = 0;
     const TRAIL_CONFIG = {
       emissionChance: 0.4,
       engineOffset: 50,
@@ -267,9 +267,9 @@
     }
 
     function emitTrail(x, y, dirX, dirY, now) {
-      if (now - lastTrailEmission < TRAIL_CONFIG.intervalMs) return;
+      if (now - lastTrailEmissionTime < TRAIL_CONFIG.intervalMs) return;
       if (Math.random() < TRAIL_CONFIG.emissionChance) {
-        lastTrailEmission = now;
+        lastTrailEmissionTime = now;
         trail.push({
           x: x + dirX * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
           y: y + dirY * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
@@ -325,7 +325,8 @@
       drawBiplane(planeX, planeY, scale, angle, bankAngle, now * 0.03);
 
       const heroHeight = hero.offsetHeight || window.innerHeight;
-      const fadeProgress = Math.min(Math.max((window.scrollY - heroHeight * 0.5) / (heroHeight * 0.5), 0), 1);
+      const fadeRange = heroHeight * 0.5;
+      const fadeProgress = Math.min(Math.max((window.scrollY - fadeRange) / fadeRange, 0), 1);
       const nextCanvasOpacity = 1 - fadeProgress;
       if (Math.abs(nextCanvasOpacity - lastCanvasOpacity) > 0.01) {
         lastCanvasOpacity = nextCanvasOpacity;
