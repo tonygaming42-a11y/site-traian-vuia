@@ -11,7 +11,7 @@
   --text-muted: #4A5060;
   --border: rgba(201, 147, 58, 0.2);
   --border-hover: rgba(201, 147, 58, 0.6);
-  --flight-path-dash-length: 2000; /* Long enough to fully mask/reveal both SVG arc segments during draw animation */
+  --flight-path-dash-length: 2000; /* Arc path spans ~1500 viewBox units total; 2000 guarantees fully hidden dash start before draw */
 }
 
 * { box-sizing: border-box; }

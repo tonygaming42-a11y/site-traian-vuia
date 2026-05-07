@@ -39,6 +39,7 @@
       emissionIntervalFrames: 3,
       lifeDecay: 0.015
     };
+    const FRAME_COUNT_RESET_THRESHOLD = 100000;
 
     function getHeroSize() {
       return {
@@ -385,7 +386,7 @@
       const delta = clock.getDelta();
       const t = elapsed * FLIGHT_PATH.speed;
       frameCount += 1;
-      if (frameCount > 100000) frameCount = 0;
+      if (frameCount > FRAME_COUNT_RESET_THRESHOLD) frameCount = 0;
 
       plane.position.x = Math.sin(t) * FLIGHT_PATH.horizontalRange;
       plane.position.y = Math.sin(t * FLIGHT_PATH.verticalFrequency) * FLIGHT_PATH.verticalAmplitude + FLIGHT_PATH.verticalOffset;
