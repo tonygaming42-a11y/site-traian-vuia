@@ -64,7 +64,7 @@
     );
     scene.add(sky);
 
-    const starCount = isMobile ? 280 : 600;
+    const starCount = isMobile ? 220 : 420;
     const starGeometry = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount; i += 1) {
