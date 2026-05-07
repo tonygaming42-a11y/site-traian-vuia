@@ -40,9 +40,7 @@
     renderer.setSize(heroSize.width, heroSize.height, false);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    canvas.style.opacity = '1';
-    canvas.style.display = 'block';
+    canvas.style.setProperty('--three-canvas-opacity', '1');
 
     const sunLight = new THREE.DirectionalLight(0xFFF4E0, 2.5);
     sunLight.position.set(5, 8, 3);
@@ -283,7 +281,7 @@
     const wires = new THREE.LineSegments(wireGeometry, new THREE.LineBasicMaterial({ color: 0x8A7A6A, transparent: true, opacity: 0.7 }));
     plane.add(wires);
 
-    plane.scale.set(2, 2, 2);
+    plane.scale.setScalar(isMobile ? 1.8 : 2);
     plane.position.set(0, 0, 0);
     scene.add(plane);
 
@@ -362,7 +360,7 @@
       const fadeProgress = Math.min(Math.max((window.scrollY - fadeStart) / Math.max(heroHeight - fadeStart, 1), 0), 1);
       const pageProgress = Math.min(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight), 1);
       skyUniforms.mixAmount.value += (pageProgress - skyUniforms.mixAmount.value) * 0.02;
-      canvas.style.opacity = String(1 - fadeProgress);
+      canvas.style.setProperty('--three-canvas-opacity', String(1 - fadeProgress));
       stars.material.opacity = Math.max(0.25, 0.9 - fadeProgress * 0.75);
       brightStars.material.opacity = Math.max(0.2, 1 - fadeProgress * 0.8);
       stars.rotation.y += 0.00005;
