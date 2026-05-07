@@ -16,4 +16,7 @@
   .cta-group { flex-direction: column; }
   .navbar { top: 0.35rem; }
   h2 { font-size: 1.4rem; }
+  .loader-text { letter-spacing: 0.14em; }
+  #trail-cursor,
+  .trail-dot { display: none; }
 }
