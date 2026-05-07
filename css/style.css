@@ -122,6 +122,7 @@ main { position: relative; z-index: 2; }
 }
 
 .hero {
+  position: relative;
   min-height: 100vh;
   display: grid;
   place-items: center;
@@ -140,15 +141,19 @@ main { position: relative; z-index: 2; }
     radial-gradient(circle at 35% 75%, rgba(220, 230, 255, 0.42) 0 0.9px, transparent 1.5px);
   background-size: 320px 320px;
   opacity: 0.22;
-  z-index: 1;
+  z-index: 0;
 }
 
 #three-canvas {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  z-index: 2;
+  z-index: 1;
+  opacity: 1 !important;
+  display: block !important;
+  pointer-events: none;
 }
 
 .heritage-silhouette {
@@ -165,7 +170,7 @@ main { position: relative; z-index: 2; }
   max-width: 980px;
   padding: 2rem;
   position: relative;
-  z-index: 3;
+  z-index: 10;
 }
 
 .overline {
