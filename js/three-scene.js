@@ -305,13 +305,14 @@
     scene.add(plane);
 
     const trailParticles = [];
+    const trailParticleGeometry = new THREE.SphereGeometry(0.04, 4, 4);
 
     function emitTrailParticle() {
       const engineWorldPos = new THREE.Vector3();
       engine.getWorldPosition(engineWorldPos);
 
       const particle = new THREE.Mesh(
-        new THREE.SphereGeometry(0.04, 4, 4),
+        trailParticleGeometry,
         new THREE.MeshBasicMaterial({
           color: 0xCCDDFF,
           transparent: true,
@@ -384,6 +385,7 @@
       const delta = clock.getDelta();
       const t = elapsed * FLIGHT_PATH.speed;
       frameCount += 1;
+      if (frameCount > 100000) frameCount = 0;
 
       plane.position.x = Math.sin(t) * FLIGHT_PATH.horizontalRange;
       plane.position.y = Math.sin(t * FLIGHT_PATH.verticalFrequency) * FLIGHT_PATH.verticalAmplitude + FLIGHT_PATH.verticalOffset;
