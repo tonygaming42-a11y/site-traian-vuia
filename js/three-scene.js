@@ -16,10 +16,12 @@
     const trail = [];
     let startTime = null;
     let lastCanvasOpacity = 1;
+    let lastTrailEmission = 0;
     const TRAIL_CONFIG = {
       emissionChance: 0.4,
       engineOffset: 50,
-      jitter: 8
+      jitter: 8,
+      intervalMs: 48
     };
 
     function resize() {
@@ -71,7 +73,7 @@
       ctx.scale(1, 1 - Math.abs(bankAngle) * 0.3);
 
       const WOOD = '#C8B89A';
-      const DARK_WOOD = '#8B6914';
+      const WOOD_ACCENT = '#8B6914';
       const CANVAS_COLOR = '#D4C9A8';
       const METAL = '#3A3A3A';
       const WIRE = 'rgba(138, 122, 106, 0.7)';
@@ -146,7 +148,7 @@
       ctx.fill();
       ctx.stroke();
 
-      ctx.strokeStyle = DARK_WOOD;
+      ctx.strokeStyle = WOOD_ACCENT;
       ctx.lineWidth = 1.5;
       [[-5, 20], [10, 35], [25, 50], [40, 65]].forEach(([topX, bottomX]) => {
         ctx.beginPath();
@@ -193,7 +195,7 @@
       ctx.rotate(propellerAngle);
       ctx.beginPath();
       ctx.ellipse(0, -14, 4, 14, 0.2, 0, Math.PI * 2);
-      ctx.fillStyle = DARK_WOOD;
+      ctx.fillStyle = WOOD_ACCENT;
       ctx.fill();
       ctx.beginPath();
       ctx.ellipse(0, 14, 4, 14, -0.2, 0, Math.PI * 2);
@@ -236,7 +238,7 @@
         ctx.beginPath();
         ctx.moveTo(wheelX, 7);
         ctx.lineTo(wheelX - 3, 22);
-        ctx.strokeStyle = DARK_WOOD;
+        ctx.strokeStyle = WOOD_ACCENT;
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -257,18 +259,20 @@
       ctx.beginPath();
       ctx.moveTo(-23, 24);
       ctx.lineTo(2, 24);
-      ctx.strokeStyle = DARK_WOOD;
+      ctx.strokeStyle = WOOD_ACCENT;
       ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.restore();
     }
 
-    function emitTrail(x, y, vx, vy) {
+    function emitTrail(x, y, dirX, dirY, now) {
+      if (now - lastTrailEmission < TRAIL_CONFIG.intervalMs) return;
       if (Math.random() < TRAIL_CONFIG.emissionChance) {
+        lastTrailEmission = now;
         trail.push({
-          x: x + vx * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
-          y: y + vy * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
+          x: x + dirX * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
+          y: y + dirY * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
           life: 1,
           r: Math.random() * 3 + 1
         });
@@ -317,7 +321,7 @@
       const bankAngle = -Math.cos(t * speed) * 0.25;
       const scale = isMobile ? 0.55 : 0.85;
 
-      emitTrail(planeX, planeY, Math.cos(angle), Math.sin(angle));
+      emitTrail(planeX, planeY, Math.cos(angle), Math.sin(angle), now);
       drawBiplane(planeX, planeY, scale, angle, bankAngle, now * 0.03);
 
       const heroHeight = hero.offsetHeight || window.innerHeight;
@@ -325,7 +329,7 @@
       const nextCanvasOpacity = 1 - fadeProgress;
       if (Math.abs(nextCanvasOpacity - lastCanvasOpacity) > 0.01) {
         lastCanvasOpacity = nextCanvasOpacity;
-        canvas.style.opacity = String(nextCanvasOpacity);
+        canvas.style.opacity = nextCanvasOpacity;
       }
 
       window.requestAnimationFrame(animate);
