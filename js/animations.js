@@ -1,4 +1,15 @@
 (function () {
+  const skyStops = [
+    { progress: 0.0, color: '#05080F' },
+    { progress: 0.15, color: '#080C18' },
+    { progress: 0.30, color: '#0D1428' },
+    { progress: 0.45, color: '#1A1A3A' },
+    { progress: 0.60, color: '#2A1A35' },
+    { progress: 0.75, color: '#1A2A4A' },
+    { progress: 0.90, color: '#1A3060' },
+    { progress: 1.0, color: '#0A1E3D' }
+  ];
+
   function lerpColor(hexA, hexB, t) {
     const from = hexA.replace('#', '');
     const to = hexB.replace('#', '');
@@ -14,28 +25,21 @@
     return `rgb(${rr}, ${rg}, ${rb})`;
   }
 
-  function getSkyColorsForProgress(progress) {
-    if (progress <= 0.3) {
-      const p = progress / 0.3;
-      return {
-        topColor: lerpColor('#080b1c', '#1a1a3e', p),
-        bottomColor: lerpColor('#101a3f', '#23275e', p)
-      };
+  function getSkyColor(progress) {
+    if (progress <= 0) return skyStops[0].color;
+    if (progress >= 1) return skyStops[skyStops.length - 1].color;
+
+    for (let i = 0; i < skyStops.length - 1; i += 1) {
+      const current = skyStops[i];
+      const next = skyStops[i + 1];
+      if (progress >= current.progress && progress <= next.progress) {
+        const range = next.progress - current.progress || 1;
+        const local = (progress - current.progress) / range;
+        return lerpColor(current.color, next.color, local);
+      }
     }
 
-    if (progress <= 0.6) {
-      const p = (progress - 0.3) / 0.3;
-      return {
-        topColor: lerpColor('#1a1a3e', '#e8572a', p),
-        bottomColor: lerpColor('#23275e', '#f4a300', p)
-      };
-    }
-
-    const p = (progress - 0.6) / 0.4;
-    return {
-      topColor: lerpColor('#e8572a', '#87ceeb', p),
-      bottomColor: lerpColor('#f4a300', '#4da3ff', p)
-    };
+    return skyStops[skyStops.length - 1].color;
   }
 
   function animateCounters() {
@@ -44,7 +48,7 @@
 
     const playCounter = (node) => {
       const target = Number(node.getAttribute('data-counter') || '0');
-      const duration = 1.7;
+      const duration = 2.4;
       let start;
       const tick = (time) => {
         if (!start) start = time;
@@ -81,35 +85,40 @@
 
   function splitHeroTitle() {
     const title = document.querySelector('.hero-title');
-    if (!title || title.dataset.splitDone === 'true') return null;
+    if (!title || title.dataset.splitDone === 'true') return [];
     const words = title.textContent.trim().split(/\s+/).filter(Boolean);
     title.textContent = '';
+
     const spans = words.map((word) => {
       const span = document.createElement('span');
-      span.className = 'word';
+      span.className = 'hero-word';
       span.textContent = `${word} `;
       title.appendChild(span);
       return span;
     });
+
     title.dataset.splitDone = 'true';
     return spans;
   }
 
+  function initSkyFallback(skyOverlay) {
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    window.addEventListener('scroll', () => {
+      const progress = Math.min(window.scrollY / maxScroll, 1);
+      const sky = getSkyColor(progress);
+      skyOverlay.style.background = `linear-gradient(180deg, ${sky} 0%, ${sky} 100%)`;
+    }, { passive: true });
+  }
+
   window.initAnimations = function initAnimations() {
     const skyOverlay = document.querySelector('.sky-overlay');
-    const heroWords = splitHeroTitle() || Array.from(document.querySelectorAll('.hero-title .word'));
-
+    const heroWords = splitHeroTitle();
     animateCounters();
 
+    if (!skyOverlay) return;
+
     if (!(window.gsap && window.ScrollTrigger)) {
-      if (skyOverlay) {
-        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-        window.addEventListener('scroll', () => {
-          const progress = Math.min(window.scrollY / maxScroll, 1);
-          const { topColor, bottomColor } = getSkyColorsForProgress(progress);
-          skyOverlay.style.background = `linear-gradient(180deg, ${topColor} 0%, ${bottomColor} 100%)`;
-        }, { passive: true });
-      }
+      initSkyFallback(skyOverlay);
       return;
     }
 
@@ -119,59 +128,39 @@
       start: 0,
       end: 'max',
       onUpdate: (self) => {
-        const progress = self.progress;
-        const { topColor, bottomColor } = getSkyColorsForProgress(progress);
-
-        if (skyOverlay) {
-          skyOverlay.style.background = `linear-gradient(180deg, ${topColor} 0%, ${bottomColor} 100%)`;
-        }
+        const sky = getSkyColor(self.progress);
+        skyOverlay.style.background = `linear-gradient(180deg, ${sky} 0%, ${sky} 100%)`;
       }
     });
 
     if (heroWords.length) {
-      gsap.from(heroWords, {
-        y: 80,
+      gsap.from('.hero-word', {
         opacity: 0,
-        rotateX: -50,
-        duration: 1,
-        ease: 'power4.out',
-        stagger: 0.08,
-        delay: 0.15
+        y: 30,
+        duration: 1.2,
+        stagger: 0.15,
+        ease: 'power2.out',
+        delay: 0.5
       });
-    }
-
-    const overline = document.querySelector('.hero-overline');
-    if (overline && !overline.dataset.typewriterDone) {
-      const text = overline.textContent;
-      overline.textContent = '';
-      let index = 0;
-      const writer = window.setInterval(() => {
-        overline.textContent += text[index] || '';
-        index += 1;
-        if (index >= text.length) {
-          window.clearInterval(writer);
-        }
-      }, 40);
-      overline.dataset.typewriterDone = 'true';
     }
 
     gsap.from('.hero .btn', {
       opacity: 0,
-      y: 26,
-      stagger: 0.15,
-      duration: 0.8,
-      ease: 'power3.out',
-      delay: 0.75
+      y: 20,
+      stagger: 0.14,
+      duration: 1,
+      ease: 'power1.out',
+      delay: 1
     });
 
     gsap.utils.toArray('.section').forEach((section) => {
       gsap.fromTo(section,
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 1,
-          ease: 'power3.out',
+          duration: 0.9,
+          ease: 'power1.out',
           scrollTrigger: {
             trigger: section,
             start: 'top 82%',
@@ -181,38 +170,25 @@
       );
     });
 
-    gsap.from('.card, .timeline-item, .hologram, .guide li', {
+    gsap.from('.card', {
+      scrollTrigger: { trigger: '.cards-3, .cards-4', start: 'top 80%' },
       opacity: 0,
-      y: 50,
-      stagger: 0.06,
-      duration: 0.85,
-      ease: 'power2.out',
+      y: 20,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power1.out'
+    });
+
+    gsap.from('.section h2', {
+      opacity: 0,
+      x: -20,
+      duration: 0.9,
+      ease: 'power1.out',
+      stagger: 0.1,
       scrollTrigger: {
         trigger: 'main',
-        start: 'top 78%'
+        start: 'top 84%'
       }
-    });
-
-    gsap.to('.cloud', {
-      xPercent: 28,
-      yPercent: -8,
-      ease: 'none',
-      stagger: 0.12,
-      scrollTrigger: {
-        trigger: '#home',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true
-      }
-    });
-
-    gsap.to('.hologram', {
-      boxShadow: '0 0 40px rgba(244,163,0,0.55), 0 0 90px rgba(244,163,0,0.22), inset 0 0 36px rgba(244,163,0,0.12)',
-      repeat: -1,
-      yoyo: true,
-      duration: 1.8,
-      stagger: 0.1,
-      ease: 'sine.inOut'
     });
   };
 })();
