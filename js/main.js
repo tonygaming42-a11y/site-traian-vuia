@@ -29,16 +29,19 @@
   function initLoader() {
     const loader = document.getElementById('loader');
     if (!loader) return;
+    loader.setAttribute('aria-hidden', 'false');
 
     const firstLoadKey = 'tve-2026-loader-shown';
     if (sessionStorage.getItem(firstLoadKey) === 'true') {
       loader.classList.add('hidden');
+      loader.setAttribute('aria-hidden', 'true');
       return;
     }
 
     sessionStorage.setItem(firstLoadKey, 'true');
     window.setTimeout(() => {
       loader.classList.add('hidden');
+      loader.setAttribute('aria-hidden', 'true');
     }, 2400);
   }
 

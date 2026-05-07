@@ -14,6 +14,30 @@
     return `rgb(${rr}, ${rg}, ${rb})`;
   }
 
+  function getSkyColorsForProgress(progress) {
+    if (progress <= 0.3) {
+      const p = progress / 0.3;
+      return {
+        topColor: lerpColor('#080b1c', '#1a1a3e', p),
+        bottomColor: lerpColor('#101a3f', '#23275e', p)
+      };
+    }
+
+    if (progress <= 0.6) {
+      const p = (progress - 0.3) / 0.3;
+      return {
+        topColor: lerpColor('#1a1a3e', '#e8572a', p),
+        bottomColor: lerpColor('#23275e', '#f4a300', p)
+      };
+    }
+
+    const p = (progress - 0.6) / 0.4;
+    return {
+      topColor: lerpColor('#87ceeb', '#4da3ff', p),
+      bottomColor: lerpColor('#b7e2ff', '#9bd5ff', p)
+    };
+  }
+
   function animateCounters() {
     const stats = document.querySelectorAll('[data-counter]');
     if (!stats.length) return;
@@ -82,21 +106,7 @@
         const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
         window.addEventListener('scroll', () => {
           const progress = Math.min(window.scrollY / maxScroll, 1);
-          let topColor;
-          let bottomColor;
-          if (progress <= 0.3) {
-            const p = progress / 0.3;
-            topColor = lerpColor('#080b1c', '#1a1a3e', p);
-            bottomColor = lerpColor('#101a3f', '#23275e', p);
-          } else if (progress <= 0.6) {
-            const p = (progress - 0.3) / 0.3;
-            topColor = lerpColor('#1a1a3e', '#e8572a', p);
-            bottomColor = lerpColor('#23275e', '#f4a300', p);
-          } else {
-            const p = (progress - 0.6) / 0.4;
-            topColor = lerpColor('#87ceeb', '#4da3ff', p);
-            bottomColor = lerpColor('#b7e2ff', '#9bd5ff', p);
-          }
+          const { topColor, bottomColor } = getSkyColorsForProgress(progress);
           skyOverlay.style.background = `linear-gradient(180deg, ${topColor} 0%, ${bottomColor} 100%)`;
         }, { passive: true });
       }
@@ -110,22 +120,7 @@
       end: 'max',
       onUpdate: (self) => {
         const progress = self.progress;
-        let topColor;
-        let bottomColor;
-
-        if (progress <= 0.3) {
-          const p = progress / 0.3;
-          topColor = lerpColor('#080b1c', '#1a1a3e', p);
-          bottomColor = lerpColor('#101a3f', '#23275e', p);
-        } else if (progress <= 0.6) {
-          const p = (progress - 0.3) / 0.3;
-          topColor = lerpColor('#1a1a3e', '#e8572a', p);
-          bottomColor = lerpColor('#23275e', '#f4a300', p);
-        } else {
-          const p = (progress - 0.6) / 0.4;
-          topColor = lerpColor('#87ceeb', '#4da3ff', p);
-          bottomColor = lerpColor('#b7e2ff', '#9bd5ff', p);
-        }
+        const { topColor, bottomColor } = getSkyColorsForProgress(progress);
 
         if (skyOverlay) {
           skyOverlay.style.background = `linear-gradient(180deg, ${topColor} 0%, ${bottomColor} 100%)`;

@@ -8,6 +8,10 @@
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const mouse = { x: 0, y: 0 };
+    const WING_DIMENSIONS = { width: 3.6, height: 0.12, depth: 0.9 };
+    const PROPELLER_BLADES = 3;
+    const SKY_TRANSITION_SPEED = 0.03;
+    const TRAIL_OFFSET = new THREE.Vector3(-0.85, 0.05, 0);
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x071126, isMobile ? 0.035 : 0.023);
@@ -94,7 +98,10 @@
     cockpit.castShadow = true;
     plane.add(cockpit);
 
-    const topWing = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.12, 0.9), wingMat);
+    const topWing = new THREE.Mesh(
+      new THREE.BoxGeometry(WING_DIMENSIONS.width, WING_DIMENSIONS.height, WING_DIMENSIONS.depth),
+      wingMat
+    );
     topWing.position.y = 0.65;
     topWing.castShadow = true;
     plane.add(topWing);
@@ -151,10 +158,10 @@
     plane.add(propellerHub);
 
     const propeller = new THREE.Group();
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < PROPELLER_BLADES; i += 1) {
       const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.1, 0.14), darkMat);
       blade.position.y = 0.55;
-      blade.rotation.z = (Math.PI * 2 * i) / 3;
+      blade.rotation.z = (Math.PI * 2 * i) / PROPELLER_BLADES;
       blade.castShadow = true;
       propeller.add(blade);
     }
@@ -266,11 +273,11 @@
       camera.position.y += ((baseCamera.y - mouse.y * 0.26) - camera.position.y) * 0.03;
       camera.lookAt(0, 0.7, -2);
 
-      skyUniforms.mixAmount.value += (scrollProgress - skyUniforms.mixAmount.value) * 0.03;
+      skyUniforms.mixAmount.value += (scrollProgress - skyUniforms.mixAmount.value) * SKY_TRANSITION_SPEED;
       stars.material.opacity = 0.88 * (1 - skyUniforms.mixAmount.value * 1.3);
       key.intensity = 1.1 + skyUniforms.mixAmount.value * 0.7;
 
-      trailHistory.unshift(plane.position.clone().add(new THREE.Vector3(-0.85, 0.05, 0)));
+      trailHistory.unshift(plane.position.clone().add(TRAIL_OFFSET));
       trailHistory.pop();
       for (let i = 0; i < trailCount; i += 1) {
         const point = trailHistory[i];
