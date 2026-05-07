@@ -73,7 +73,10 @@
       </svg>
       <div class="hero-content">
         <p class="overline hero-overline" data-i18n="hero.overline">9-10 Octombrie 2026 · Timișoara</p>
-        <h1 class="hero-title" data-i18n="hero.title">Salonul Internațional de Invenții și Inovație Traian Vuia 2026</h1>
+        <h1 class="hero-title">
+          <span class="hero-title-line1" data-i18n="hero.title.line1">Salonul Internațional de</span>
+          <span class="hero-title-line2"><span data-i18n="hero.title.line2.prefix">Invenții și Inovație</span> <em data-i18n="hero.title.line2.em">Traian Vuia</em> <span data-i18n="hero.title.line2.suffix">2026</span></span>
+        </h1>
         <p data-i18n="hero.subtitle">Primul zbor al ideilor care schimbă viitorul.</p>
         <div class="countdown" id="countdown" aria-live="polite">
           <div><span id="days">000</span><small data-i18n="countdown.days">Zile</small></div>
@@ -90,9 +93,37 @@
       <div class="clouds" aria-hidden="true">
         <span class="cloud"></span><span class="cloud"></span><span class="cloud"></span>
       </div>
+      <div class="scroll-invite">
+        <span class="scroll-invite-text" data-i18n="hero.scrollInvite">Descoperă</span>
+        <span class="scroll-invite-arrow">↓</span>
+      </div>
+      <div class="flight-path-connector" aria-hidden="true">
+        <svg class="flight-path-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+          <path
+            class="flight-path-line"
+            d="M 720 10 Q 360 60 0 110 M 720 10 Q 1080 60 1440 110"
+            stroke="rgba(201, 147, 58, 0.3)"
+            stroke-width="1.5"
+            fill="none"
+            stroke-dasharray="8 6"
+          />
+          <text class="flight-path-plane" x="50%" y="20" text-anchor="middle" font-size="16">✈</text>
+        </svg>
+        <div class="trail-dots">
+          <span class="trail-dot"></span>
+          <span class="trail-dot"></span>
+          <span class="trail-dot"></span>
+          <span class="trail-dot"></span>
+          <span class="trail-dot"></span>
+        </div>
+      </div>
     </section>
 
     <section id="about" class="section">
+      <div class="section-arrival-mark" aria-hidden="true">
+        <span class="arrival-plane">✈</span>
+        <span class="arrival-line"></span>
+      </div>
       <h2 data-i18n="sections.about.title">More Than About</h2>
       <p data-i18n="sections.about.text">Istorie, misiune și viziune pentru un salon internațional dedicat inovației.</p>
       <div class="grid cards-3">

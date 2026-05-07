@@ -59,7 +59,7 @@
     const points = [];
     for (let i = 0; i < trailCount; i += 1) {
       const dot = document.createElement('span');
-      dot.className = 'trail-dot';
+      dot.className = 'cursor-trail-dot';
       document.body.appendChild(dot);
       points.push({ el: dot, x: window.innerWidth / 2, y: window.innerHeight / 2 });
     }

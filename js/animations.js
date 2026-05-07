@@ -86,6 +86,10 @@
   function splitHeroTitle() {
     const title = document.querySelector('.hero-title');
     if (!title || title.dataset.splitDone === 'true') return [];
+    if (title.querySelector('.hero-title-line1, .hero-title-line2')) {
+      title.dataset.splitDone = 'true';
+      return [];
+    }
     const words = title.textContent.trim().split(/\s+/).filter(Boolean);
     title.textContent = '';
 

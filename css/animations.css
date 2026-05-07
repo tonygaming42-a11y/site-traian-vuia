@@ -8,6 +8,21 @@
   to { transform: translateX(42px); }
 }
 
+@keyframes drawFlightPath {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes trailDotFall {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(60px); }
+}
+
+@keyframes scrollInvitePulse {
+  0%, 100% { opacity: 0.6; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(5px); }
+}
+
 .cloud {
   animation: cloudDrift 28s ease-in-out infinite alternate;
 }
