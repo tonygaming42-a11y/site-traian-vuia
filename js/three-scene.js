@@ -20,7 +20,7 @@
     const BOTTOM_WING = { span: 3.2, thickness: 0.025, chord: 0.64, y: -0.22, dihedral: 0.018 };
     const STRUT_X_POSITIONS = [-1.25, -0.4, 0.4, 1.25];
     const STRUT_Z_POSITIONS = [-0.27, 0.27];
-    const cameraBase = { x: 0, y: 1, z: 7 };
+    const cameraBase = { x: 0, y: 1.2, z: 8 };
 
     function getHeroSize() {
       return {
@@ -32,8 +32,9 @@
     const scene = new THREE.Scene();
 
     const heroSize = getHeroSize();
-    const camera = new THREE.PerspectiveCamera(48, heroSize.width / heroSize.height, 0.1, 240);
+    const camera = new THREE.PerspectiveCamera(60, heroSize.width / heroSize.height, 0.1, 240);
     camera.position.set(cameraBase.x, cameraBase.y, cameraBase.z);
+    camera.updateProjectionMatrix();
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
@@ -281,9 +282,37 @@
     const wires = new THREE.LineSegments(wireGeometry, new THREE.LineBasicMaterial({ color: 0x8A7A6A, transparent: true, opacity: 0.7 }));
     plane.add(wires);
 
-    plane.scale.setScalar(isMobile ? 1.8 : 2);
+    plane.scale.setScalar(isMobile ? 2.2 : 2.8);
     plane.position.set(0, 0, 0);
     scene.add(plane);
+
+    const trailParticles = [];
+
+    function emitTrailParticle() {
+      const engineWorldPos = new THREE.Vector3();
+      engine.getWorldPosition(engineWorldPos);
+
+      const particle = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 4, 4),
+        new THREE.MeshBasicMaterial({
+          color: 0xCCDDFF,
+          transparent: true,
+          opacity: 0.6
+        })
+      );
+      particle.position.copy(engineWorldPos);
+
+      scene.add(particle);
+      trailParticles.push({
+        mesh: particle,
+        life: 1,
+        velocity: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.02,
+          -0.02,
+          0.01 + (Math.random() - 0.5) * 0.02
+        )
+      });
+    }
 
     const groundShadow = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), new THREE.ShadowMaterial({ opacity: 0.14 }));
     groundShadow.rotation.x = -Math.PI / 2;
@@ -330,26 +359,36 @@
 
     const clock = new THREE.Clock();
     let lastCanvasOpacity = 1;
+    let frameCount = 0;
 
     function animate() {
       const elapsed = clock.getElapsedTime();
       const delta = clock.getDelta();
-      const t = elapsed * 0.18;
+      const t = elapsed * 0.15;
+      frameCount += 1;
 
       plane.position.x = Math.sin(t) * 2.8;
-      plane.position.y = Math.sin(t * 2) * 0.35;
-      plane.position.z = Math.cos(t * 0.9) * 0.6;
+      plane.position.y = Math.sin(t * 1.5) * 0.6 + 0.5;
+      plane.position.z = Math.cos(t * 0.5) * 0.5;
 
-      plane.rotation.z = -Math.cos(t) * 0.18;
-      plane.rotation.x = Math.cos(t * 2) * 0.06;
-      plane.position.y += Math.sin(elapsed * 3.7) * 0.015;
-
-      const climb = scrollState.progress;
-      plane.position.y += climb * 2.7;
-      plane.position.z -= climb * 1.8;
-      plane.rotation.x -= climb * 0.18;
+      plane.rotation.z = -Math.cos(t) * 0.15;
+      plane.rotation.x = Math.cos(t * 1.5) * 0.05;
 
       propeller.rotation.x += delta * 12;
+
+      if (frameCount % 3 === 0) emitTrailParticle();
+
+      for (let i = trailParticles.length - 1; i >= 0; i -= 1) {
+        const particle = trailParticles[i];
+        particle.life -= 0.015;
+        particle.mesh.position.add(particle.velocity);
+        particle.mesh.material.opacity = Math.max(0, particle.life * 0.6);
+        particle.mesh.scale.setScalar(1 + (1 - particle.life) * 0.5);
+        if (particle.life <= 0) {
+          scene.remove(particle.mesh);
+          trailParticles.splice(i, 1);
+        }
+      }
 
       camera.position.x += ((cameraBase.x + mouseTarget.x) - camera.position.x) * 0.02;
       camera.position.y += ((cameraBase.y - mouseTarget.y) - camera.position.y) * 0.02;
