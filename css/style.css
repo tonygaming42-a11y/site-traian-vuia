@@ -11,6 +11,7 @@
   --text-muted: #4A5060;
   --border: rgba(201, 147, 58, 0.2);
   --border-hover: rgba(201, 147, 58, 0.6);
+  --flight-path-dash-length: 2000;
 }
 
 * { box-sizing: border-box; }
@@ -221,8 +222,8 @@ main { position: relative; z-index: 2; }
 }
 
 .flight-path-line {
-  stroke-dasharray: 2000;
-  stroke-dashoffset: 2000;
+  stroke-dasharray: var(--flight-path-dash-length);
+  stroke-dashoffset: var(--flight-path-dash-length);
   animation: drawFlightPath 3s ease-out 1s forwards;
 }
 

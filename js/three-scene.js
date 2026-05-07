@@ -28,12 +28,16 @@
       verticalAmplitude: 0.6,
       verticalOffset: 0.5,
       depthFrequency: 0.5,
-      depthAmplitude: 0.5
+      depthAmplitude: 0.5,
+      scaleMobile: 2.2,
+      scaleDesktop: 2.8
     };
     const TRAIL_PARTICLE = {
       spread: 0.02,
       downwardDrift: -0.02,
-      forwardDrift: 0.01
+      forwardDrift: 0.01,
+      emissionIntervalFrames: 3,
+      lifeDecay: 0.015
     };
 
     function getHeroSize() {
@@ -296,7 +300,7 @@
     const wires = new THREE.LineSegments(wireGeometry, new THREE.LineBasicMaterial({ color: 0x8A7A6A, transparent: true, opacity: 0.7 }));
     plane.add(wires);
 
-    plane.scale.setScalar(isMobile ? 2.2 : 2.8);
+    plane.scale.setScalar(isMobile ? FLIGHT_PATH.scaleMobile : FLIGHT_PATH.scaleDesktop);
     plane.position.set(0, 0, 0);
     scene.add(plane);
 
@@ -390,11 +394,11 @@
 
       propeller.rotation.x += delta * 12;
 
-      if (frameCount % 3 === 0) emitTrailParticle();
+      if (frameCount % TRAIL_PARTICLE.emissionIntervalFrames === 0) emitTrailParticle();
 
       for (let i = trailParticles.length - 1; i >= 0; i -= 1) {
         const particle = trailParticles[i];
-        particle.life -= 0.015;
+        particle.life -= TRAIL_PARTICLE.lifeDecay;
         particle.mesh.position.add(particle.velocity);
         particle.mesh.material.opacity = Math.max(0, particle.life * 0.6);
         particle.mesh.scale.setScalar(1 + (1 - particle.life) * 0.5);
