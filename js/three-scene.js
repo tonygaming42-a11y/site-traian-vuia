@@ -329,6 +329,7 @@
     window.addEventListener('resize', onResize);
 
     const clock = new THREE.Clock();
+    let lastCanvasOpacity = 1;
 
     function animate() {
       const elapsed = clock.getElapsedTime();
@@ -357,10 +358,15 @@
 
       const heroHeight = hero.offsetHeight || window.innerHeight;
       const fadeStart = heroHeight * 0.5;
-      const fadeProgress = Math.min(Math.max((window.scrollY - fadeStart) / Math.max(heroHeight - fadeStart, 1), 0), 1);
+      const fadeRange = Math.max(heroHeight * 0.5, 120);
+      const fadeProgress = Math.min(Math.max((window.scrollY - fadeStart) / fadeRange, 0), 1);
       const pageProgress = Math.min(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight), 1);
       skyUniforms.mixAmount.value += (pageProgress - skyUniforms.mixAmount.value) * 0.02;
-      canvas.style.setProperty('--three-canvas-opacity', String(1 - fadeProgress));
+      const canvasOpacity = 1 - fadeProgress;
+      if (Math.abs(canvasOpacity - lastCanvasOpacity) > 0.01) {
+        canvas.style.setProperty('--three-canvas-opacity', String(canvasOpacity));
+        lastCanvasOpacity = canvasOpacity;
+      }
       stars.material.opacity = Math.max(0.25, 0.9 - fadeProgress * 0.75);
       brightStars.material.opacity = Math.max(0.2, 1 - fadeProgress * 0.8);
       stars.rotation.y += 0.00005;
