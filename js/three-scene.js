@@ -11,6 +11,10 @@
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const mouseTarget = { x: 0, y: 0 };
     const scrollState = { progress: 0 };
+    const TOP_WING = { span: 3.8, thickness: 0.025, chord: 0.72, y: 0.35, dihedral: 0.02 };
+    const BOTTOM_WING = { span: 3.2, thickness: 0.025, chord: 0.64, y: -0.22, dihedral: 0.018 };
+    const STRUT_X_POSITIONS = [-1.25, -0.4, 0.4, 1.25];
+    const STRUT_Z_POSITIONS = [-0.27, 0.27];
 
     const scene = new THREE.Scene();
 
@@ -136,21 +140,21 @@
       side: THREE.DoubleSide
     });
 
-    const topWing = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.025, 0.72), wingMat);
-    topWing.position.set(0, 0.35, 0);
-    topWing.rotation.z = 0.02;
+    const topWing = new THREE.Mesh(new THREE.BoxGeometry(TOP_WING.span, TOP_WING.thickness, TOP_WING.chord), wingMat);
+    topWing.position.set(0, TOP_WING.y, 0);
+    topWing.rotation.z = TOP_WING.dihedral;
     topWing.castShadow = true;
     plane.add(topWing);
 
-    const bottomWing = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.025, 0.64), wingMat);
-    bottomWing.position.set(0, -0.22, 0);
-    bottomWing.rotation.z = 0.018;
+    const bottomWing = new THREE.Mesh(new THREE.BoxGeometry(BOTTOM_WING.span, BOTTOM_WING.thickness, BOTTOM_WING.chord), wingMat);
+    bottomWing.position.set(0, BOTTOM_WING.y, 0);
+    bottomWing.rotation.z = BOTTOM_WING.dihedral;
     bottomWing.castShadow = true;
     plane.add(bottomWing);
 
     const strutMat = new THREE.MeshStandardMaterial({ color: 0x5C3D1E, metalness: 0.0, roughness: 0.9 });
-    [-1.25, -0.4, 0.4, 1.25].forEach((x) => {
-      [-0.27, 0.27].forEach((z) => {
+    STRUT_X_POSITIONS.forEach((x) => {
+      STRUT_Z_POSITIONS.forEach((z) => {
         const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.55, 8), strutMat);
         strut.position.set(x, 0.07, z);
         strut.castShadow = true;
@@ -224,16 +228,12 @@
       plane.add(gearStrut);
     });
 
-    const wirePoints = [
-      [-1.25, 0.35, -0.27], [-1.25, -0.22, -0.27],
-      [-0.4, 0.35, -0.27], [-0.4, -0.22, -0.27],
-      [0.4, 0.35, -0.27], [0.4, -0.22, -0.27],
-      [1.25, 0.35, -0.27], [1.25, -0.22, -0.27],
-      [-1.25, 0.35, 0.27], [-1.25, -0.22, 0.27],
-      [-0.4, 0.35, 0.27], [-0.4, -0.22, 0.27],
-      [0.4, 0.35, 0.27], [0.4, -0.22, 0.27],
-      [1.25, 0.35, 0.27], [1.25, -0.22, 0.27]
-    ];
+    const wirePoints = [];
+    STRUT_X_POSITIONS.forEach((x) => {
+      STRUT_Z_POSITIONS.forEach((z) => {
+        wirePoints.push([x, TOP_WING.y, z], [x, BOTTOM_WING.y, z]);
+      });
+    });
 
     const wireGeometry = new THREE.BufferGeometry();
     wireGeometry.setAttribute('position', new THREE.Float32BufferAttribute(wirePoints.flat(), 3));

@@ -550,8 +550,6 @@ nav a.active {
 .cloud:nth-child(2) { top: 25%; right: 18%; }
 .cloud:nth-child(3) { bottom: 28%; left: 42%; }
 
-.grass { display: none; }
-
 #trail-cursor {
   width: 10px;
   height: 10px;
