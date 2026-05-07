@@ -15,6 +15,12 @@
     const stars = [];
     const trail = [];
     let startTime = null;
+    let lastCanvasOpacity = 1;
+    const TRAIL_CONFIG = {
+      emissionChance: 0.4,
+      engineOffset: 50,
+      jitter: 8
+    };
 
     function resize() {
       canvas.width = hero.clientWidth || window.innerWidth;
@@ -259,10 +265,10 @@
     }
 
     function emitTrail(x, y, vx, vy) {
-      if (Math.random() < 0.4) {
+      if (Math.random() < TRAIL_CONFIG.emissionChance) {
         trail.push({
-          x: x + vx * 50 + (Math.random() - 0.5) * 8,
-          y: y + vy * 50 + (Math.random() - 0.5) * 8,
+          x: x + vx * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
+          y: y + vy * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
           life: 1,
           r: Math.random() * 3 + 1
         });
@@ -316,7 +322,11 @@
 
       const heroHeight = hero.offsetHeight || window.innerHeight;
       const fadeProgress = Math.min(Math.max((window.scrollY - heroHeight * 0.5) / (heroHeight * 0.5), 0), 1);
-      canvas.style.opacity = String(1 - fadeProgress);
+      const nextCanvasOpacity = 1 - fadeProgress;
+      if (Math.abs(nextCanvasOpacity - lastCanvasOpacity) > 0.01) {
+        lastCanvasOpacity = nextCanvasOpacity;
+        canvas.style.opacity = String(nextCanvasOpacity);
+      }
 
       window.requestAnimationFrame(animate);
     }
