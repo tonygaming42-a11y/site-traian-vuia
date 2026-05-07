@@ -1,4 +1,9 @@
 (function () {
+  function initThreeSceneOnLoad() {
+    if (window.__threeSceneInitialized || typeof window.initThreeScene !== 'function') return;
+    window.initThreeScene();
+  }
+
   function initMenu() {
     const button = document.getElementById('menu-toggle');
     const nav = document.getElementById('main-nav');
@@ -169,7 +174,7 @@
     initLoader();
     window.initLanguageSwitcher?.();
     window.initCountdown?.();
-    window.initThreeScene?.();
+    initThreeSceneOnLoad();
     window.initAnimations?.();
 
     initMenu();
@@ -180,4 +185,6 @@
     initGallery();
     initForm();
   });
+
+  window.addEventListener('load', initThreeSceneOnLoad);
 })();

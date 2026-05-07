@@ -1,12 +1,17 @@
 (function () {
   window.initThreeScene = function initThreeScene() {
+    if (window.__threeSceneInitialized) return true;
+
     const canvas = document.getElementById('three-canvas');
     const hero = document.getElementById('home');
 
     if (!canvas || !hero || !window.THREE) {
       console.warn('Three.js scene was not initialized because required elements are unavailable.');
-      return;
+      return false;
     }
+
+    window.__threeSceneInitialized = true;
+    console.log('Initializing hero Three.js scene');
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const mouseTarget = { x: 0, y: 0 };
@@ -15,17 +20,27 @@
     const BOTTOM_WING = { span: 3.2, thickness: 0.025, chord: 0.64, y: -0.22, dihedral: 0.018 };
     const STRUT_X_POSITIONS = [-1.25, -0.4, 0.4, 1.25];
     const STRUT_Z_POSITIONS = [-0.27, 0.27];
+    const cameraBase = { x: 0, y: 1, z: 7 };
+
+    function getHeroSize() {
+      return {
+        width: hero.clientWidth || window.innerWidth,
+        height: hero.clientHeight || window.innerHeight
+      };
+    }
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 240);
-    camera.position.set(0, 0.3, isMobile ? 7.8 : 6.8);
+    const heroSize = getHeroSize();
+    const camera = new THREE.PerspectiveCamera(48, heroSize.width / heroSize.height, 0.1, 240);
+    camera.position.set(cameraBase.x, cameraBase.y, cameraBase.z);
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(heroSize.width, heroSize.height, false);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    canvas.style.setProperty('--three-canvas-opacity', '1');
 
     const sunLight = new THREE.DirectionalLight(0xFFF4E0, 2.5);
     sunLight.position.set(5, 8, 3);
@@ -64,23 +79,49 @@
     );
     scene.add(sky);
 
-    const starCount = isMobile ? 220 : 420;
+    const starCount = isMobile ? 2000 : 2600;
     const starGeometry = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount; i += 1) {
-      const radius = 52 + Math.random() * 24;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI;
-      starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      starPositions[i * 3 + 1] = radius * Math.cos(phi);
-      starPositions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+      starPositions[i * 3] = (Math.random() - 0.5) * 200;
+      starPositions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+      starPositions[i * 3 + 2] = (Math.random() - 0.5) * 200;
     }
     starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
     const stars = new THREE.Points(
       starGeometry,
-      new THREE.PointsMaterial({ color: 0xd9e6ff, size: 0.5, transparent: true, opacity: 0.85, depthWrite: false })
+      new THREE.PointsMaterial({
+        color: 0xFFFFFF,
+        size: 0.4,
+        transparent: true,
+        opacity: 0.9,
+        sizeAttenuation: true,
+        depthWrite: false
+      })
     );
     scene.add(stars);
+
+    const brightStarCount = isMobile ? 200 : 260;
+    const brightStarGeometry = new THREE.BufferGeometry();
+    const brightPositions = new Float32Array(brightStarCount * 3);
+    for (let i = 0; i < brightStarCount; i += 1) {
+      brightPositions[i * 3] = (Math.random() - 0.5) * 150;
+      brightPositions[i * 3 + 1] = Math.random() * 100;
+      brightPositions[i * 3 + 2] = (Math.random() - 0.5) * 150;
+    }
+    brightStarGeometry.setAttribute('position', new THREE.BufferAttribute(brightPositions, 3));
+    const brightStars = new THREE.Points(
+      brightStarGeometry,
+      new THREE.PointsMaterial({
+        color: 0xFFEECC,
+        size: 0.8,
+        transparent: true,
+        opacity: 1,
+        sizeAttenuation: true,
+        depthWrite: false
+      })
+    );
+    scene.add(brightStars);
 
     function createCloud(x, y, z, scale) {
       const cloud = new THREE.Group();
@@ -240,8 +281,8 @@
     const wires = new THREE.LineSegments(wireGeometry, new THREE.LineBasicMaterial({ color: 0x8A7A6A, transparent: true, opacity: 0.7 }));
     plane.add(wires);
 
-    plane.scale.setScalar(isMobile ? 0.9 : 1.15);
-    plane.position.set(0, 0.3, -1.5);
+    plane.scale.setScalar(isMobile ? 1.8 : 2);
+    plane.position.set(0, 0, 0);
     scene.add(plane);
 
     const groundShadow = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), new THREE.ShadowMaterial({ opacity: 0.14 }));
@@ -278,24 +319,26 @@
     }
 
     function onResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const nextSize = getHeroSize();
+      camera.aspect = nextSize.width / nextSize.height;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(nextSize.width, nextSize.height, false);
     }
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('resize', onResize);
 
     const clock = new THREE.Clock();
+    let lastCanvasOpacity = 1;
 
     function animate() {
       const elapsed = clock.getElapsedTime();
       const delta = clock.getDelta();
       const t = elapsed * 0.18;
 
-      plane.position.x = Math.sin(t) * 3.5;
-      plane.position.y = Math.sin(t * 2) * 0.4 + 0.3;
-      plane.position.z = Math.cos(t) * 0.8 - 1.5;
+      plane.position.x = Math.sin(t) * 2.8;
+      plane.position.y = Math.sin(t * 2) * 0.35;
+      plane.position.z = Math.cos(t * 0.9) * 0.6;
 
       plane.rotation.z = -Math.cos(t) * 0.18;
       plane.rotation.x = Math.cos(t * 2) * 0.06;
@@ -308,13 +351,26 @@
 
       propeller.rotation.x += delta * 12;
 
-      camera.position.x += (mouseTarget.x - camera.position.x) * 0.02;
-      camera.position.y += (-mouseTarget.y - camera.position.y) * 0.02;
-      camera.lookAt(0, 0, -1.4);
+      camera.position.x += ((cameraBase.x + mouseTarget.x) - camera.position.x) * 0.02;
+      camera.position.y += ((cameraBase.y - mouseTarget.y) - camera.position.y) * 0.02;
+      camera.position.z += (cameraBase.z - camera.position.z) * 0.02;
+      camera.lookAt(0, 0, 0);
 
+      const heroHeight = hero.offsetHeight || window.innerHeight;
+      const fadeStart = heroHeight * 0.5;
+      const fadeRange = Math.max(heroHeight * 0.5, 120);
+      const fadeProgress = Math.min(Math.max((window.scrollY - fadeStart) / fadeRange, 0), 1);
       const pageProgress = Math.min(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight), 1);
       skyUniforms.mixAmount.value += (pageProgress - skyUniforms.mixAmount.value) * 0.02;
-      stars.material.opacity = Math.max(0, 0.85 - pageProgress * 1.2);
+      const canvasOpacity = 1 - fadeProgress;
+      if (Math.abs(canvasOpacity - lastCanvasOpacity) > 0.01) {
+        canvas.style.setProperty('--three-canvas-opacity', String(canvasOpacity));
+        lastCanvasOpacity = canvasOpacity;
+      }
+      stars.material.opacity = Math.max(0.25, 0.9 - fadeProgress * 0.75);
+      brightStars.material.opacity = Math.max(0.2, 1 - fadeProgress * 0.8);
+      stars.rotation.y += 0.00005;
+      brightStars.rotation.y += 0.00003;
 
       clouds.forEach((cloud, index) => {
         cloud.position.x += 0.0014 + index * 0.0002;
@@ -326,5 +382,6 @@
     }
 
     animate();
+    return true;
   };
 })();
