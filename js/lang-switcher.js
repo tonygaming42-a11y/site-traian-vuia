@@ -20,7 +20,11 @@
     const select = document.getElementById('language-select');
     if (select && select.value !== lang) select.value = lang;
 
-    try { localStorage.setItem('tve-lang', lang); } catch (error) { }
+    try {
+      localStorage.setItem('tve-lang', lang);
+    } catch (error) {
+      console.warn('Unable to persist selected language.', error);
+    }
   };
 
   window.initLanguageSwitcher = function initLanguageSwitcher() {
@@ -28,7 +32,12 @@
     if (!select) return;
 
     const saved = (() => {
-      try { return localStorage.getItem('tve-lang'); } catch (error) { return null; }
+      try {
+        return localStorage.getItem('tve-lang');
+      } catch (error) {
+        console.warn('Unable to read persisted language.', error);
+        return null;
+      }
     })();
 
     const lang = saved || 'ro';
