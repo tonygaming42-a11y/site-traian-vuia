@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" role="img" aria-label="TVE 2026 logo placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#002B7F" />
+      <stop offset="1" stop-color="#F4A300" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="60" rx="12" fill="#0e1a3a" />
+  <path d="M14 34 L58 22 L94 30 L58 38 Z" fill="url(#g)" />
+  <path d="M58 22 L76 16 L94 30" fill="none" stroke="#F0F4F8" stroke-width="2" />
+  <text x="102" y="27" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700">TVE</text>
+  <text x="102" y="42" fill="#F4A300" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">2026</text>
+</svg>
