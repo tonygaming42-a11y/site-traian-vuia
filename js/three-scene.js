@@ -21,6 +21,20 @@
     const STRUT_X_POSITIONS = [-1.25, -0.4, 0.4, 1.25];
     const STRUT_Z_POSITIONS = [-0.27, 0.27];
     const cameraBase = { x: 0, y: 1.2, z: 8 };
+    const FLIGHT_PATH = {
+      speed: 0.15,
+      horizontalRange: 2.8,
+      verticalFrequency: 1.5,
+      verticalAmplitude: 0.6,
+      verticalOffset: 0.5,
+      depthFrequency: 0.5,
+      depthAmplitude: 0.5
+    };
+    const TRAIL_PARTICLE = {
+      spread: 0.02,
+      downwardDrift: -0.02,
+      forwardDrift: 0.01
+    };
 
     function getHeroSize() {
       return {
@@ -307,9 +321,9 @@
         mesh: particle,
         life: 1,
         velocity: new THREE.Vector3(
-          (Math.random() - 0.5) * 0.02,
-          -0.02,
-          0.01 + (Math.random() - 0.5) * 0.02
+          (Math.random() - 0.5) * TRAIL_PARTICLE.spread,
+          TRAIL_PARTICLE.downwardDrift,
+          TRAIL_PARTICLE.forwardDrift + (Math.random() - 0.5) * TRAIL_PARTICLE.spread
         )
       });
     }
@@ -364,15 +378,15 @@
     function animate() {
       const elapsed = clock.getElapsedTime();
       const delta = clock.getDelta();
-      const t = elapsed * 0.15;
+      const t = elapsed * FLIGHT_PATH.speed;
       frameCount += 1;
 
-      plane.position.x = Math.sin(t) * 2.8;
-      plane.position.y = Math.sin(t * 1.5) * 0.6 + 0.5;
-      plane.position.z = Math.cos(t * 0.5) * 0.5;
+      plane.position.x = Math.sin(t) * FLIGHT_PATH.horizontalRange;
+      plane.position.y = Math.sin(t * FLIGHT_PATH.verticalFrequency) * FLIGHT_PATH.verticalAmplitude + FLIGHT_PATH.verticalOffset;
+      plane.position.z = Math.cos(t * FLIGHT_PATH.depthFrequency) * FLIGHT_PATH.depthAmplitude;
 
       plane.rotation.z = -Math.cos(t) * 0.15;
-      plane.rotation.x = Math.cos(t * 1.5) * 0.05;
+      plane.rotation.x = Math.cos(t * FLIGHT_PATH.verticalFrequency) * 0.05;
 
       propeller.rotation.x += delta * 12;
 
