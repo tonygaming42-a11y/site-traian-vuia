@@ -12,12 +12,13 @@
     const PROPELLER_BLADES = 3;
     const SKY_TRANSITION_SPEED = 0.03;
     const TRAIL_OFFSET = new THREE.Vector3(-0.85, 0.05, 0);
+    const BASE_CAMERA_POSITION = new THREE.Vector3(0, 2, isMobile ? 12 : 10);
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x071126, isMobile ? 0.035 : 0.023);
 
     const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 350);
-    camera.position.set(0, 2, isMobile ? 12 : 10);
+    camera.position.copy(BASE_CAMERA_POSITION);
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.6 : 2));
@@ -244,8 +245,6 @@
     window.addEventListener('resize', onResize);
 
     const clock = new THREE.Clock();
-    const baseCamera = new THREE.Vector3(0, 2, isMobile ? 12 : 10);
-
     function animate() {
       const t = clock.getElapsedTime();
       const scrollProgress = Math.min(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight), 1);
@@ -269,8 +268,8 @@
         cloud.position.y += Math.sin(t * 0.5 + index * 1.8) * 0.0036;
       });
 
-      camera.position.x += ((baseCamera.x + mouse.x * 0.42) - camera.position.x) * 0.03;
-      camera.position.y += ((baseCamera.y - mouse.y * 0.26) - camera.position.y) * 0.03;
+      camera.position.x += ((BASE_CAMERA_POSITION.x + mouse.x * 0.42) - camera.position.x) * 0.03;
+      camera.position.y += ((BASE_CAMERA_POSITION.y - mouse.y * 0.26) - camera.position.y) * 0.03;
       camera.lookAt(0, 0.7, -2);
 
       skyUniforms.mixAmount.value += (scrollProgress - skyUniforms.mixAmount.value) * SKY_TRANSITION_SPEED;

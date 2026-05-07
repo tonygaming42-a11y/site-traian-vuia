@@ -33,8 +33,8 @@
 
     const p = (progress - 0.6) / 0.4;
     return {
-      topColor: lerpColor('#87ceeb', '#4da3ff', p),
-      bottomColor: lerpColor('#b7e2ff', '#9bd5ff', p)
+      topColor: lerpColor('#e8572a', '#87ceeb', p),
+      bottomColor: lerpColor('#f4a300', '#4da3ff', p)
     };
   }
 
