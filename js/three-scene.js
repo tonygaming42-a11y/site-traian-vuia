@@ -17,13 +17,21 @@
     let heroScrollProgress = 0;
     let globalSkyProgress = 0;
     const disposables = [];
+    const PROPELLER_ROTATION_SPEED = 15;
+    const BLADE_PITCH_ANGLE = 0.2;
+    const HERO_FADE_MULTIPLIER = 1.5;
+    const POINT_SIZE_PERSPECTIVE_SCALE = 300;
+    const WING_WIRE_TOP_Y = 0.72;
+    const WING_WIRE_BOTTOM_Y = -0.14;
     const BASE_CAMERA_POSITION = new THREE.Vector3(0, isMobile ? 1.5 : 1.8, isMobile ? 9.2 : 8.3);
     const FLIGHT_CENTER = new THREE.Vector3(0, 1.5, -4.2);
+    const initialWidth = heroSection.clientWidth || window.innerWidth;
+    const initialHeight = heroSection.clientHeight || window.innerHeight || 1;
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x1b2637, isMobile ? 0.03 : 0.022);
 
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 320);
+    const camera = new THREE.PerspectiveCamera(45, initialWidth / Math.max(1, initialHeight || window.innerHeight), 0.1, 320);
     camera.position.copy(BASE_CAMERA_POSITION);
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -56,9 +64,35 @@
       new THREE.ShaderMaterial({
         side: THREE.BackSide,
         uniforms: skyUniforms,
-        vertexShader: 'varying vec3 vPos; void main(){ vPos = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-        fragmentShader:
-          'uniform vec3 nightColor; uniform vec3 dawnColor; uniform vec3 dayColor; uniform vec3 horizonWarm; uniform float progress; varying vec3 vPos; void main(){ float h = clamp((vPos.y + 1.0) * 0.5, 0.0, 1.0); float dawnMix = smoothstep(0.12, 0.55, progress); float dayMix = smoothstep(0.45, 0.95, progress); vec3 base = mix(nightColor, dawnColor, dawnMix); base = mix(base, dayColor, dayMix); vec3 top = base * 0.72 + vec3(0.03, 0.06, 0.12); vec3 horizon = mix(base, horizonWarm, 0.42); float glow = smoothstep(0.0, 0.34, h) * (1.0 - smoothstep(0.34, 0.72, h)); vec3 col = mix(horizon, top, smoothstep(0.02, 0.95, h)); col += horizonWarm * glow * 0.16; gl_FragColor = vec4(col, 1.0); }'
+        vertexShader: `
+          varying vec3 vPos;
+          void main() {
+            vPos = normalize(position);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 nightColor;
+          uniform vec3 dawnColor;
+          uniform vec3 dayColor;
+          uniform vec3 horizonWarm;
+          uniform float progress;
+          varying vec3 vPos;
+
+          void main() {
+            float h = clamp((vPos.y + 1.0) * 0.5, 0.0, 1.0);
+            float dawnMix = smoothstep(0.12, 0.55, progress);
+            float dayMix = smoothstep(0.45, 0.95, progress);
+            vec3 base = mix(nightColor, dawnColor, dawnMix);
+            base = mix(base, dayColor, dayMix);
+            vec3 top = base * 0.72 + vec3(0.03, 0.06, 0.12);
+            vec3 horizon = mix(base, horizonWarm, 0.42);
+            float glow = smoothstep(0.0, 0.34, h) * (1.0 - smoothstep(0.34, 0.72, h));
+            vec3 col = mix(horizon, top, smoothstep(0.02, 0.95, h));
+            col += horizonWarm * glow * 0.16;
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `
       })
     );
     scene.add(skyDome);
@@ -218,7 +252,7 @@
       const blade = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.32, 0.13), propellerMat);
       blade.position.y = 0.65;
       blade.rotation.z = i * Math.PI;
-      blade.rotation.y = i === 0 ? 0.2 : -0.2;
+      blade.rotation.y = i === 0 ? BLADE_PITCH_ANGLE : -BLADE_PITCH_ANGLE;
       blade.castShadow = true;
       propeller.add(blade);
       disposables.push(blade.geometry);
@@ -229,16 +263,16 @@
 
     const wirePoints = [];
     [
-      [-1.15, 0.72, -0.3, -1.15, -0.14, -0.3],
-      [-1.15, 0.72, 0.3, -1.15, -0.14, 0.3],
-      [0, 0.72, -0.3, 0, -0.14, -0.3],
-      [0, 0.72, 0.3, 0, -0.14, 0.3],
-      [0.95, 0.72, -0.3, 0.95, -0.14, -0.3],
-      [0.95, 0.72, 0.3, 0.95, -0.14, 0.3],
-      [-1.15, 0.72, -0.3, 0, -0.14, 0.3],
-      [0, 0.72, -0.3, 0.95, -0.14, 0.3],
-      [-1.15, 0.72, 0.3, 0, -0.14, -0.3],
-      [0, 0.72, 0.3, 0.95, -0.14, -0.3]
+      [-1.15, WING_WIRE_TOP_Y, -0.3, -1.15, WING_WIRE_BOTTOM_Y, -0.3],
+      [-1.15, WING_WIRE_TOP_Y, 0.3, -1.15, WING_WIRE_BOTTOM_Y, 0.3],
+      [0, WING_WIRE_TOP_Y, -0.3, 0, WING_WIRE_BOTTOM_Y, -0.3],
+      [0, WING_WIRE_TOP_Y, 0.3, 0, WING_WIRE_BOTTOM_Y, 0.3],
+      [0.95, WING_WIRE_TOP_Y, -0.3, 0.95, WING_WIRE_BOTTOM_Y, -0.3],
+      [0.95, WING_WIRE_TOP_Y, 0.3, 0.95, WING_WIRE_BOTTOM_Y, 0.3],
+      [-1.15, WING_WIRE_TOP_Y, -0.3, 0, WING_WIRE_BOTTOM_Y, 0.3],
+      [0, WING_WIRE_TOP_Y, -0.3, 0.95, WING_WIRE_BOTTOM_Y, 0.3],
+      [-1.15, WING_WIRE_TOP_Y, 0.3, 0, WING_WIRE_BOTTOM_Y, -0.3],
+      [0, WING_WIRE_TOP_Y, 0.3, 0.95, WING_WIRE_BOTTOM_Y, -0.3]
     ].forEach((segment) => {
       wirePoints.push(
         new THREE.Vector3(segment[0], segment[1], segment[2]),
@@ -313,10 +347,31 @@
       trailGeometry,
       new THREE.ShaderMaterial({
         uniforms: {
-          pointSize: { value: isMobile ? 14 : 18 }
+          basePointSize: { value: isMobile ? 14 : 18 }
         },
-        vertexShader: 'attribute float alpha; varying float vAlpha; uniform float pointSize; void main(){ vAlpha = alpha; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_PointSize = pointSize * (300.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }',
-        fragmentShader: 'varying float vAlpha; void main(){ vec2 c = gl_PointCoord - vec2(0.5); float d = dot(c, c); if (d > 0.25) discard; float fade = smoothstep(0.25, 0.0, d); gl_FragColor = vec4(vec3(1.0), vAlpha * fade * 0.55); }',
+        vertexShader: `
+          attribute float alpha;
+          varying float vAlpha;
+          uniform float basePointSize;
+
+          void main() {
+            vAlpha = alpha;
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = basePointSize * (${POINT_SIZE_PERSPECTIVE_SCALE.toFixed(1)} / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying float vAlpha;
+
+          void main() {
+            vec2 c = gl_PointCoord - vec2(0.5);
+            float d = dot(c, c);
+            if (d > 0.25) discard;
+            float fade = smoothstep(0.25, 0.0, d);
+            gl_FragColor = vec4(vec3(1.0), vAlpha * fade * 0.55);
+          }
+        `,
         transparent: true,
         depthWrite: false
       })
@@ -350,6 +405,15 @@
       globalSkyProgress = Math.min(window.scrollY / maxScroll, 1);
     }
 
+    function getHeroScrollProgress() {
+      const rect = heroSection.getBoundingClientRect();
+      return rect.top < 0 ? Math.min(Math.abs(rect.top) / Math.max(1, rect.height), 1) : 0;
+    }
+
+    function getCanvasOpacityFromHeroProgress(progress) {
+      return Math.max(0, 1 - progress * HERO_FADE_MULTIPLIER);
+    }
+
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('resize', onResize);
     window.addEventListener('scroll', updateGlobalSkyProgress, { passive: true });
@@ -363,17 +427,15 @@
         trigger: '#home',
         start: 'top top',
         end: 'bottom top',
-        onUpdate: (self) => {
-          heroScrollProgress = self.progress;
-          renderer.domElement.style.opacity = String(Math.max(0, 1 - self.progress * 1.5));
+        onUpdate: () => {
+          heroScrollProgress = getHeroScrollProgress();
+          renderer.domElement.style.opacity = String(getCanvasOpacityFromHeroProgress(heroScrollProgress));
         }
       });
     } else {
       const updateHeroProgress = () => {
-        const rect = heroSection.getBoundingClientRect();
-        const progress = rect.top < 0 ? Math.min(Math.abs(rect.top) / Math.max(1, rect.height), 1) : 0;
-        heroScrollProgress = progress;
-        renderer.domElement.style.opacity = String(Math.max(0, 1 - progress * 1.5));
+        heroScrollProgress = getHeroScrollProgress();
+        renderer.domElement.style.opacity = String(getCanvasOpacityFromHeroProgress(heroScrollProgress));
       };
       updateHeroProgress();
       window.addEventListener('scroll', updateHeroProgress, { passive: true });
@@ -408,11 +470,11 @@
 
       const horizontalTurn = lookAtPos.x - currentPos.x;
       const verticalPitch = lookAtPos.y - currentPos.y;
-      const bank = THREE.MathUtils.clamp(horizontalTurn * 0.32, -0.34, 0.34);
-      plane.rotateZ(bank);
+      const bankAngle = THREE.MathUtils.clamp(horizontalTurn * 0.32, -0.34, 0.34);
+      plane.rotateZ(bankAngle);
       plane.rotateX(THREE.MathUtils.clamp(verticalPitch * 0.18, -0.12, 0.12));
 
-      propeller.rotation.x = elapsed * 15;
+      propeller.rotation.x = elapsed * PROPELLER_ROTATION_SPEED;
 
       clouds.forEach((cloud, index) => {
         cloud.position.x += Math.sin(elapsed * 0.06 + index) * 0.0017;
@@ -426,8 +488,7 @@
       skyUniforms.progress.value += (globalSkyProgress - skyUniforms.progress.value) * 0.03;
       stars.material.opacity = Math.max(0, 0.95 - skyUniforms.progress.value * 1.25);
 
-      plane.updateMatrixWorld(true);
-      engineWorldPos.copy(engineOffset).applyMatrix4(planeBody.matrixWorld);
+      engineWorldPos.copy(engineOffset).applyQuaternion(plane.quaternion).add(plane.position);
       trailHistory.unshift(engineWorldPos.clone());
       trailHistory.pop();
       for (let i = 0; i < trailCount; i += 1) {
