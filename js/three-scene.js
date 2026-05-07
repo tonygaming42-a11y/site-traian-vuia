@@ -274,6 +274,7 @@
         trail.push({
           x: x + dirX * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
           y: y + dirY * TRAIL_CONFIG.engineOffset + (Math.random() - 0.5) * TRAIL_CONFIG.jitter,
+          driftX: (Math.random() - 0.5) * 0.3,
           life: 1,
           r: Math.random() * 3 + 1
         });
@@ -284,7 +285,7 @@
       for (let i = trail.length - 1; i >= 0; i -= 1) {
         const particle = trail[i];
         particle.life -= 0.02 * deltaFrames;
-        particle.x += (Math.random() - 0.5) * 0.3 * deltaFrames;
+        particle.x += particle.driftX * deltaFrames;
         particle.y -= 0.2 * deltaFrames;
 
         if (particle.life <= 0) {
@@ -301,7 +302,7 @@
 
     function animate(now) {
       if (!startTime) startTime = now;
-      const deltaFrames = lastFrameTime ? Math.max((now - lastFrameTime) / 16.67, 0.25) : 1;
+      const deltaFrames = lastFrameTime ? Math.max((now - lastFrameTime) / 16.67, 0.1) : 1;
       lastFrameTime = now;
       const t = (now - startTime) / 1000;
       const W = canvas.width;
