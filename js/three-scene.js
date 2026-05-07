@@ -15,6 +15,7 @@
     const stars = [];
     const trail = [];
     let startTime = null;
+    let lastFrameTime = null;
     let lastCanvasOpacity = 1;
     let lastTrailEmissionTime = 0;
     const TRAIL_CONFIG = {
@@ -279,12 +280,12 @@
       }
     }
 
-    function drawTrail() {
+    function drawTrail(deltaFrames) {
       for (let i = trail.length - 1; i >= 0; i -= 1) {
         const particle = trail[i];
-        particle.life -= 0.02;
-        particle.x += (Math.random() - 0.5) * 0.3;
-        particle.y -= 0.2;
+        particle.life -= 0.02 * deltaFrames;
+        particle.x += (Math.random() - 0.5) * 0.3 * deltaFrames;
+        particle.y -= 0.2 * deltaFrames;
 
         if (particle.life <= 0) {
           trail.splice(i, 1);
@@ -300,13 +301,15 @@
 
     function animate(now) {
       if (!startTime) startTime = now;
+      const deltaFrames = lastFrameTime ? Math.max((now - lastFrameTime) / 16.67, 0.25) : 1;
+      lastFrameTime = now;
       const t = (now - startTime) / 1000;
       const W = canvas.width;
       const H = canvas.height;
 
       drawSky();
       drawStars(t);
-      drawTrail();
+      drawTrail(deltaFrames);
 
       const cx = W * 0.5;
       const cy = H * 0.42;
@@ -333,10 +336,10 @@
         canvas.style.opacity = nextCanvasOpacity;
       }
 
-      window.requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     }
 
-    window.requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
     return true;
   };
 }());
