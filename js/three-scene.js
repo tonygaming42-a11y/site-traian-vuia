@@ -1,7 +1,10 @@
 (function () {
   window.initThreeScene = function initThreeScene() {
     const canvas = document.getElementById('three-canvas');
-    if (!canvas || !window.THREE) return;
+    if (!canvas || !window.THREE) {
+      console.warn('Three.js scene was not initialized because canvas or THREE is unavailable.');
+      return;
+    }
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);

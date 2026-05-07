@@ -1,7 +1,6 @@
 (function () {
   function getTranslation(pack, key) {
-    if (pack && Object.prototype.hasOwnProperty.call(pack, key)) return pack[key];
-    return key.split('.').reduce((acc, chunk) => (acc && chunk in acc ? acc[chunk] : undefined), pack);
+    return pack && Object.prototype.hasOwnProperty.call(pack, key) ? pack[key] : undefined;
   }
 
   window.applyLanguage = function applyLanguage(lang) {
