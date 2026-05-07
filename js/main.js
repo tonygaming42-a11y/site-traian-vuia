@@ -50,7 +50,7 @@
     const cursor = document.getElementById('trail-cursor');
     if (!cursor || window.matchMedia('(pointer: coarse)').matches) return;
 
-    const trailCount = 6;
+    const trailCount = 4;
     const points = [];
     for (let i = 0; i < trailCount; i += 1) {
       const dot = document.createElement('span');
@@ -71,8 +71,8 @@
     function animateDots() {
       points.forEach((point, index) => {
         const target = index === 0 ? { x, y } : points[index - 1];
-        point.x += (target.x - point.x) * (0.24 - index * 0.02);
-        point.y += (target.y - point.y) * (0.24 - index * 0.02);
+        point.x += (target.x - point.x) * (0.18 - index * 0.015);
+        point.y += (target.y - point.y) * (0.18 - index * 0.015);
         point.el.style.left = `${point.x}px`;
         point.el.style.top = `${point.y}px`;
       });

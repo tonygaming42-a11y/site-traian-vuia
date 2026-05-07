@@ -1,72 +1,21 @@
-@keyframes drawUnderline {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-@keyframes logoPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
-}
-
-@keyframes starsDrift {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-60px, 40px, 0); }
-}
-
-@keyframes loaderTakeOff {
-  0% { transform: translate(-140px, 70px) rotate(-8deg) scale(0.7); opacity: 0; }
-  30% { opacity: 1; }
-  70% { transform: translate(20px, -18px) rotate(8deg) scale(1.05); }
-  100% { transform: translate(180px, -90px) rotate(22deg) scale(0.8); opacity: 0.15; }
-}
-
 @keyframes loaderFill {
-  0% { width: 0; }
-  100% { width: 100%; }
+  from { width: 0; }
+  to { width: 100%; }
 }
 
-@keyframes countdownPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(244, 163, 0, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(244, 163, 0, 0.7), 0 0 80px rgba(244, 163, 0, 0.3); }
-}
-
-@keyframes hologramPulse {
-  from { box-shadow: 0 0 20px rgba(244, 163, 0, 0.3), 0 0 40px rgba(244, 163, 0, 0.1); }
-  to { box-shadow: 0 0 40px rgba(244, 163, 0, 0.6), 0 0 80px rgba(244, 163, 0, 0.2); }
-}
-
-@keyframes hologramShine {
-  0% { transform: translateX(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) rotate(45deg); }
-}
-
-@keyframes cloudFloat {
-  from { transform: translateX(0) translateY(0); }
-  to { transform: translateX(40px) translateY(-15px); }
-}
-
-@keyframes btnBorderRun {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes grassWave {
-  from { transform: skewX(0deg); }
-  to { transform: skewX(3deg); }
-}
-
-.countdown div {
-  animation: countdownPulse 2s ease-in-out infinite;
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(42px); }
 }
 
 .cloud {
-  animation: cloudFloat 8s ease-in-out infinite alternate;
+  animation: cloudDrift 28s ease-in-out infinite alternate;
 }
 
 .section {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transform: translateY(24px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
 }
 
 .section.visible {

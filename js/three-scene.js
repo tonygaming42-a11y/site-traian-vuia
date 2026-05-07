@@ -1,202 +1,104 @@
 (function () {
   window.initThreeScene = function initThreeScene() {
     const canvas = document.getElementById('three-canvas');
-    if (!canvas || !window.THREE) {
-      console.warn('Three.js scene was not initialized because canvas or THREE is unavailable.');
+    const hero = document.getElementById('home');
+
+    if (!canvas || !hero || !window.THREE) {
+      console.warn('Three.js scene was not initialized because required elements are unavailable.');
       return;
     }
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const mouse = { x: 0, y: 0 };
-    const WING_DIMENSIONS = { width: 3.6, height: 0.12, depth: 0.9 };
-    const PROPELLER_BLADES = 3;
-    const SKY_TRANSITION_SPEED = 0.03;
-    const TRAIL_OFFSET = new THREE.Vector3(-0.85, 0.05, 0);
-    const BASE_CAMERA_POSITION = new THREE.Vector3(0, 2, isMobile ? 12 : 10);
+    const mouseTarget = { x: 0, y: 0 };
+    const scrollState = { progress: 0 };
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x071126, isMobile ? 0.035 : 0.023);
 
-    const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 350);
-    camera.position.copy(BASE_CAMERA_POSITION);
+    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 240);
+    camera.position.set(0, 0.3, isMobile ? 7.8 : 6.8);
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.6 : 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.75);
-    const hemi = new THREE.HemisphereLight(0x9fd6ff, 0x0d1728, 0.95);
-    const key = new THREE.DirectionalLight(0xffd27e, 1.35);
-    key.position.set(8, 12, 7);
-    key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
-    key.shadow.camera.left = -14;
-    key.shadow.camera.right = 14;
-    key.shadow.camera.top = 14;
-    key.shadow.camera.bottom = -14;
-    scene.add(ambient, hemi, key);
+    const sunLight = new THREE.DirectionalLight(0xFFF4E0, 2.5);
+    sunLight.position.set(5, 8, 3);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(1024, 1024);
+    sunLight.shadow.camera.left = -8;
+    sunLight.shadow.camera.right = 8;
+    sunLight.shadow.camera.top = 8;
+    sunLight.shadow.camera.bottom = -8;
+
+    const fillLight = new THREE.DirectionalLight(0xC8D8F0, 0.6);
+    fillLight.position.set(-3, 2, -2);
+
+    const rimLight = new THREE.DirectionalLight(0xF0E8D0, 0.4);
+    rimLight.position.set(0, -1, -5);
+
+    const ambientLight = new THREE.AmbientLight(0x101820, 0.8);
+    scene.add(sunLight, fillLight, rimLight, ambientLight);
 
     const skyUniforms = {
-      nightTop: { value: new THREE.Color(0x050816) },
-      nightBottom: { value: new THREE.Color(0x0f2444) },
-      dayTop: { value: new THREE.Color(0x87ceeb) },
-      dayBottom: { value: new THREE.Color(0x4da3ff) },
+      topNight: { value: new THREE.Color(0x05080F) },
+      bottomNight: { value: new THREE.Color(0x0D1428) },
+      topDay: { value: new THREE.Color(0x0A1E3D) },
+      bottomDay: { value: new THREE.Color(0x1A3060) },
       mixAmount: { value: 0 }
     };
 
-    const skyDome = new THREE.Mesh(
-      new THREE.SphereGeometry(180, 48, 24),
+    const sky = new THREE.Mesh(
+      new THREE.SphereGeometry(80, 32, 32),
       new THREE.ShaderMaterial({
         side: THREE.BackSide,
         uniforms: skyUniforms,
         vertexShader: 'varying vec3 vPos; void main(){ vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-        fragmentShader:
-          'uniform vec3 nightTop; uniform vec3 nightBottom; uniform vec3 dayTop; uniform vec3 dayBottom; uniform float mixAmount; varying vec3 vPos; void main(){ float h = smoothstep(-1.0, 1.0, normalize(vPos).y); vec3 night = mix(nightBottom, nightTop, h); vec3 day = mix(dayBottom, dayTop, h); gl_FragColor = vec4(mix(night, day, mixAmount), 1.0); }'
+        fragmentShader: 'uniform vec3 topNight; uniform vec3 bottomNight; uniform vec3 topDay; uniform vec3 bottomDay; uniform float mixAmount; varying vec3 vPos; void main(){ float h = smoothstep(-1.0, 1.0, normalize(vPos).y); vec3 night = mix(bottomNight, topNight, h); vec3 day = mix(bottomDay, topDay, h); gl_FragColor = vec4(mix(night, day, mixAmount), 1.0); }'
       })
     );
-    scene.add(skyDome);
+    scene.add(sky);
 
-    const starCount = isMobile ? 120 : 260;
-    const starsGeom = new THREE.BufferGeometry();
-    const starsPos = new Float32Array(starCount * 3);
+    const starCount = isMobile ? 280 : 600;
+    const starGeometry = new THREE.BufferGeometry();
+    const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount; i += 1) {
-      const r = 120 + Math.random() * 40;
+      const radius = 52 + Math.random() * 24;
       const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI * 0.65;
-      starsPos[i * 3] = r * Math.cos(theta) * Math.sin(phi);
-      starsPos[i * 3 + 1] = 40 + r * Math.cos(phi);
-      starsPos[i * 3 + 2] = r * Math.sin(theta) * Math.sin(phi);
+      const phi = Math.random() * Math.PI;
+      starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      starPositions[i * 3 + 1] = radius * Math.cos(phi);
+      starPositions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
     }
-    starsGeom.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
     const stars = new THREE.Points(
-      starsGeom,
-      new THREE.PointsMaterial({ color: 0xfff6c2, size: isMobile ? 0.45 : 0.55, transparent: true, opacity: 0.9 })
+      starGeometry,
+      new THREE.PointsMaterial({ color: 0xd9e6ff, size: 0.5, transparent: true, opacity: 0.85, depthWrite: false })
     );
     scene.add(stars);
 
-    const plane = new THREE.Group();
-    const fuselageMat = new THREE.MeshStandardMaterial({ color: 0xf5e9cf, roughness: 0.32, metalness: 0.25 });
-    const wingMat = new THREE.MeshStandardMaterial({ color: 0x1f57c6, roughness: 0.42, metalness: 0.15 });
-    const accentMat = new THREE.MeshStandardMaterial({ color: 0xf4a300, roughness: 0.2, metalness: 0.55, emissive: 0x2f1a00, emissiveIntensity: 0.18 });
-    const darkMat = new THREE.MeshStandardMaterial({ color: 0x181d2a, roughness: 0.56, metalness: 0.2 });
-
-    const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.22, 4.3, 24), fuselageMat);
-    fuselage.rotation.z = Math.PI / 2;
-    fuselage.castShadow = true;
-    plane.add(fuselage);
-
-    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.62, 24), accentMat);
-    nose.rotation.z = -Math.PI / 2;
-    nose.position.x = 2.44;
-    nose.castShadow = true;
-    plane.add(nose);
-
-    const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.24, 18, 18), new THREE.MeshStandardMaterial({ color: 0x9ed0ff, transparent: true, opacity: 0.65, roughness: 0.12, metalness: 0.2 }));
-    cockpit.scale.set(1.3, 0.8, 0.9);
-    cockpit.position.set(-0.1, 0.25, 0);
-    cockpit.castShadow = true;
-    plane.add(cockpit);
-
-    const topWing = new THREE.Mesh(
-      new THREE.BoxGeometry(WING_DIMENSIONS.width, WING_DIMENSIONS.height, WING_DIMENSIONS.depth),
-      wingMat
-    );
-    topWing.position.y = 0.65;
-    topWing.castShadow = true;
-    plane.add(topWing);
-
-    const bottomWing = topWing.clone();
-    bottomWing.position.y = -0.48;
-    plane.add(bottomWing);
-
-    [-1.15, 0, 1.15].forEach((x) => {
-      const strutL = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.05, 10), accentMat);
-      strutL.position.set(x, 0.08, -0.3);
-      strutL.castShadow = true;
-      plane.add(strutL);
-
-      const strutR = strutL.clone();
-      strutR.position.z = 0.3;
-      plane.add(strutR);
-    });
-
-    const tailH = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.08, 0.75), wingMat);
-    tailH.position.set(-2.05, 0.28, 0);
-    tailH.castShadow = true;
-    plane.add(tailH);
-
-    const tailV = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.58, 0.52), accentMat);
-    tailV.position.set(-2.02, 0.56, 0);
-    tailV.castShadow = true;
-    plane.add(tailV);
-
-    const gearBar = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.45, 10), darkMat);
-    gearBar.rotation.z = Math.PI / 2;
-    gearBar.position.set(0.3, -0.9, 0);
-    gearBar.castShadow = true;
-    plane.add(gearBar);
-
-    const wheelGeometry = new THREE.TorusGeometry(0.24, 0.09, 12, 24);
-    const wheelL = new THREE.Mesh(wheelGeometry, darkMat);
-    wheelL.position.set(0.3, -1.02, -0.78);
-    wheelL.rotation.y = Math.PI / 2;
-    wheelL.castShadow = true;
-    const wheelR = wheelL.clone();
-    wheelR.position.z = 0.78;
-    plane.add(wheelL, wheelR);
-
-    const rearWheel = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.045, 10, 20), darkMat);
-    rearWheel.position.set(-1.88, -0.75, 0);
-    rearWheel.rotation.y = Math.PI / 2;
-    rearWheel.castShadow = true;
-    plane.add(rearWheel);
-
-    const propellerHub = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.18, 12), accentMat);
-    propellerHub.rotation.z = Math.PI / 2;
-    propellerHub.position.set(2.57, 0, 0);
-    plane.add(propellerHub);
-
-    const propeller = new THREE.Group();
-    for (let i = 0; i < PROPELLER_BLADES; i += 1) {
-      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.1, 0.14), darkMat);
-      blade.position.y = 0.55;
-      blade.rotation.z = (Math.PI * 2 * i) / PROPELLER_BLADES;
-      blade.castShadow = true;
-      propeller.add(blade);
-    }
-    propeller.rotation.x = Math.PI / 2;
-    propeller.position.set(2.64, 0, 0);
-    plane.add(propeller);
-
-    plane.scale.setScalar(isMobile ? 0.82 : 1.18);
-    scene.add(plane);
-
-    const shadowPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(32, 22),
-      new THREE.ShadowMaterial({ opacity: 0.14 })
-    );
-    shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -2.1;
-    shadowPlane.receiveShadow = true;
-    scene.add(shadowPlane);
-
     function createCloud(x, y, z, scale) {
       const cloud = new THREE.Group();
-      const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, transparent: true, opacity: 0.88 });
-      const puffs = [
-        { x: 0, y: 0, z: 0, s: 1 },
-        { x: 0.7, y: 0.25, z: 0, s: 0.82 },
-        { x: -0.65, y: 0.15, z: 0.1, s: 0.75 },
-        { x: 0.15, y: 0.28, z: 0.5, s: 0.72 },
-        { x: 0.2, y: 0.18, z: -0.48, s: 0.67 }
-      ];
-      puffs.forEach((puff) => {
-        const part = new THREE.Mesh(new THREE.SphereGeometry(0.8 * puff.s, 16, 16), cloudMat);
-        part.position.set(puff.x, puff.y, puff.z);
+      const cloudMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.06,
+        roughness: 1,
+        metalness: 0
+      });
+
+      [
+        [0, 0, 0, 1],
+        [0.45, 0.08, 0.15, 0.75],
+        [-0.48, 0.03, -0.1, 0.68],
+        [0.1, 0.14, -0.35, 0.62]
+      ].forEach(([cx, cy, cz, s]) => {
+        const part = new THREE.Mesh(new THREE.SphereGeometry(0.7 * s, 12, 12), cloudMaterial);
+        part.position.set(cx, cy, cz);
         cloud.add(part);
       });
+
       cloud.position.set(x, y, z);
       cloud.scale.setScalar(scale);
       scene.add(cloud);
@@ -204,35 +106,175 @@
     }
 
     const clouds = [
-      createCloud(-8, 4.8, -8, 1.5),
-      createCloud(8, 3.7, -10, 1.35),
-      createCloud(2, 5.1, -14, 1.85),
-      ...(!isMobile ? [createCloud(-3, 3.2, -7, 1.1), createCloud(11, 4.5, -16, 1.4)] : [])
+      createCloud(-6, 2.8, -8, 1.6),
+      createCloud(5, 3.3, -10, 1.4),
+      createCloud(1.5, 2.4, -7, 1.1)
     ];
 
-    const trailCount = isMobile ? 70 : 140;
-    const trailGeometry = new THREE.BufferGeometry();
-    const trailPositions = new Float32Array(trailCount * 3);
-    const trailSizes = new Float32Array(trailCount);
-    for (let i = 0; i < trailCount; i += 1) {
-      trailPositions[i * 3] = 0;
-      trailPositions[i * 3 + 1] = 0;
-      trailPositions[i * 3 + 2] = 0;
-      trailSizes[i] = Math.random() * 0.35 + 0.2;
-    }
-    trailGeometry.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
-    trailGeometry.setAttribute('size', new THREE.BufferAttribute(trailSizes, 1));
-    const trail = new THREE.Points(
-      trailGeometry,
-      new THREE.PointsMaterial({ color: 0xfbc04d, size: isMobile ? 0.17 : 0.2, transparent: true, opacity: 0.78, depthWrite: false })
-    );
-    scene.add(trail);
+    const plane = new THREE.Group();
 
-    const trailHistory = Array.from({ length: trailCount }, () => new THREE.Vector3(0, 0, 0));
+    const fuselageGeo = new THREE.CylinderGeometry(0.04, 0.14, 2.2, 12);
+    const fuselageMat = new THREE.MeshStandardMaterial({ color: 0xC8B89A, metalness: 0.0, roughness: 0.88 });
+    const fuselage = new THREE.Mesh(fuselageGeo, fuselageMat);
+    fuselage.rotation.z = Math.PI / 2;
+    fuselage.castShadow = true;
+    plane.add(fuselage);
+
+    const noseCap = new THREE.Mesh(
+      new THREE.ConeGeometry(0.11, 0.22, 12),
+      new THREE.MeshStandardMaterial({ color: 0xB9A98C, metalness: 0.0, roughness: 0.82 })
+    );
+    noseCap.rotation.z = -Math.PI / 2;
+    noseCap.position.x = 1.2;
+    noseCap.castShadow = true;
+    plane.add(noseCap);
+
+    const wingMat = new THREE.MeshStandardMaterial({
+      color: 0xD4C9A8,
+      metalness: 0.0,
+      roughness: 0.95,
+      side: THREE.DoubleSide
+    });
+
+    const topWing = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.025, 0.72), wingMat);
+    topWing.position.set(0, 0.35, 0);
+    topWing.rotation.z = 0.02;
+    topWing.castShadow = true;
+    plane.add(topWing);
+
+    const bottomWing = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.025, 0.64), wingMat);
+    bottomWing.position.set(0, -0.22, 0);
+    bottomWing.rotation.z = 0.018;
+    bottomWing.castShadow = true;
+    plane.add(bottomWing);
+
+    const strutMat = new THREE.MeshStandardMaterial({ color: 0x5C3D1E, metalness: 0.0, roughness: 0.9 });
+    [-1.25, -0.4, 0.4, 1.25].forEach((x) => {
+      [-0.27, 0.27].forEach((z) => {
+        const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.55, 8), strutMat);
+        strut.position.set(x, 0.07, z);
+        strut.castShadow = true;
+        plane.add(strut);
+      });
+    });
+
+    const engineMat = new THREE.MeshStandardMaterial({ color: 0x2A2A2A, metalness: 0.8, roughness: 0.4 });
+    const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.18, 16), engineMat);
+    engine.rotation.z = Math.PI / 2;
+    engine.position.x = 1.05;
+    engine.castShadow = true;
+    plane.add(engine);
+
+    for (let i = 0; i < 3; i += 1) {
+      const fin = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.006, 6, 20), new THREE.MeshStandardMaterial({ color: 0x3A3A3A, metalness: 0.72, roughness: 0.45 }));
+      fin.position.x = 0.98 + i * 0.045;
+      fin.rotation.y = Math.PI / 2;
+      plane.add(fin);
+    }
+
+    const propeller = new THREE.Group();
+    const bladeMat = new THREE.MeshStandardMaterial({ color: 0x8B5E2A, metalness: 0.0, roughness: 0.8 });
+
+    const bladeA = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.7, 0.02), bladeMat);
+    bladeA.position.y = 0.35;
+    bladeA.rotation.z = Math.PI / 12;
+    propeller.add(bladeA);
+
+    const bladeB = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.7, 0.02), bladeMat);
+    bladeB.position.y = -0.35;
+    bladeB.rotation.z = Math.PI + Math.PI / 12;
+    propeller.add(bladeB);
+
+    const propHub = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.09, 10), new THREE.MeshStandardMaterial({ color: 0x4B3A2A, roughness: 0.72, metalness: 0.15 }));
+    propHub.rotation.z = Math.PI / 2;
+    propeller.add(propHub);
+    propeller.position.x = 1.19;
+    propeller.rotation.x = Math.PI / 2;
+    plane.add(propeller);
+
+    const tailH = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.02, 0.28), wingMat);
+    tailH.position.set(-1.03, 0.02, 0);
+    tailH.castShadow = true;
+    plane.add(tailH);
+
+    const tailV = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.32, 0.28), wingMat);
+    tailV.position.set(-1.03, 0.17, 0);
+    tailV.castShadow = true;
+    plane.add(tailV);
+
+    const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.7, 8), strutMat);
+    axle.rotation.z = Math.PI / 2;
+    axle.position.set(0.2, -0.52, 0);
+    plane.add(axle);
+
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, metalness: 0.05, roughness: 0.95 });
+    const leftWheel = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.04, 8, 16), wheelMat);
+    leftWheel.position.set(0.2, -0.52, -0.35);
+    leftWheel.rotation.y = Math.PI / 2;
+    leftWheel.castShadow = true;
+
+    const rightWheel = leftWheel.clone();
+    rightWheel.position.z = 0.35;
+    plane.add(leftWheel, rightWheel);
+
+    [-0.16, 0.16].forEach((z) => {
+      const gearStrut = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.35, 8), strutMat);
+      gearStrut.position.set(0.05, -0.36, z);
+      gearStrut.rotation.z = z > 0 ? -0.36 : 0.36;
+      plane.add(gearStrut);
+    });
+
+    const wirePoints = [
+      [-1.25, 0.35, -0.27], [-1.25, -0.22, -0.27],
+      [-0.4, 0.35, -0.27], [-0.4, -0.22, -0.27],
+      [0.4, 0.35, -0.27], [0.4, -0.22, -0.27],
+      [1.25, 0.35, -0.27], [1.25, -0.22, -0.27],
+      [-1.25, 0.35, 0.27], [-1.25, -0.22, 0.27],
+      [-0.4, 0.35, 0.27], [-0.4, -0.22, 0.27],
+      [0.4, 0.35, 0.27], [0.4, -0.22, 0.27],
+      [1.25, 0.35, 0.27], [1.25, -0.22, 0.27]
+    ];
+
+    const wireGeometry = new THREE.BufferGeometry();
+    wireGeometry.setAttribute('position', new THREE.Float32BufferAttribute(wirePoints.flat(), 3));
+    const wires = new THREE.LineSegments(wireGeometry, new THREE.LineBasicMaterial({ color: 0x8A7A6A, transparent: true, opacity: 0.7 }));
+    plane.add(wires);
+
+    plane.scale.setScalar(isMobile ? 0.9 : 1.15);
+    plane.position.set(0, 0.3, -1.5);
+    scene.add(plane);
+
+    const groundShadow = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), new THREE.ShadowMaterial({ opacity: 0.14 }));
+    groundShadow.rotation.x = -Math.PI / 2;
+    groundShadow.position.y = -1.4;
+    groundShadow.receiveShadow = true;
+    scene.add(groundShadow);
+
+    if (window.gsap && window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      ScrollTrigger.create({
+        trigger: hero,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+        onUpdate: (self) => {
+          scrollState.progress = self.progress;
+        }
+      });
+    } else {
+      const updateScrollFallback = () => {
+        const heroRect = hero.getBoundingClientRect();
+        const range = hero.offsetHeight || window.innerHeight;
+        const progressed = Math.min(Math.max(-heroRect.top / range, 0), 1);
+        scrollState.progress = progressed;
+      };
+      window.addEventListener('scroll', updateScrollFallback, { passive: true });
+      updateScrollFallback();
+    }
 
     function onMouseMove(event) {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
+      mouseTarget.x = (event.clientX / window.innerWidth - 0.5) * 0.3;
+      mouseTarget.y = (event.clientY / window.innerHeight - 0.5) * 0.2;
     }
 
     function onResize() {
@@ -245,47 +287,39 @@
     window.addEventListener('resize', onResize);
 
     const clock = new THREE.Clock();
+
     function animate() {
-      const t = clock.getElapsedTime();
-      const scrollProgress = Math.min(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight), 1);
+      const elapsed = clock.getElapsedTime();
+      const delta = clock.getDelta();
+      const t = elapsed * 0.18;
 
-      const x = Math.sin(t * 0.42) * (isMobile ? 2.4 : 3.8);
-      const y = 1.2 + Math.sin(t * 0.84) * (isMobile ? 0.36 : 0.65);
-      const z = -1.4 + Math.cos(t * 0.42) * (isMobile ? 1.1 : 1.8);
-      plane.position.set(x, y, z);
+      plane.position.x = Math.sin(t) * 3.5;
+      plane.position.y = Math.sin(t * 2) * 0.4 + 0.3;
+      plane.position.z = Math.cos(t) * 0.8 - 1.5;
 
-      const dx = Math.cos(t * 0.42) * 0.42;
-      const dy = Math.cos(t * 0.84) * 0.84;
-      const dz = -Math.sin(t * 0.42) * 0.42;
-      const targetDir = new THREE.Vector3(dx, dy, dz).normalize();
-      plane.lookAt(plane.position.clone().add(targetDir));
-      plane.rotation.z += Math.sin(t * 1.8) * 0.045;
+      plane.rotation.z = -Math.cos(t) * 0.18;
+      plane.rotation.x = Math.cos(t * 2) * 0.06;
+      plane.position.y += Math.sin(elapsed * 3.7) * 0.015;
 
-      propeller.rotation.z += isMobile ? 1.2 : 1.7;
+      const climb = scrollState.progress;
+      plane.position.y += climb * 2.7;
+      plane.position.z -= climb * 1.8;
+      plane.rotation.x -= climb * 0.18;
+
+      propeller.rotation.x += delta * 12;
+
+      camera.position.x += (mouseTarget.x - camera.position.x) * 0.02;
+      camera.position.y += (-mouseTarget.y - camera.position.y) * 0.02;
+      camera.lookAt(0, 0, -1.4);
+
+      const pageProgress = Math.min(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight), 1);
+      skyUniforms.mixAmount.value += (pageProgress - skyUniforms.mixAmount.value) * 0.02;
+      stars.material.opacity = Math.max(0, 0.85 - pageProgress * 1.2);
 
       clouds.forEach((cloud, index) => {
-        cloud.position.x += Math.sin(t * 0.05 + index) * 0.0024;
-        cloud.position.y += Math.sin(t * 0.5 + index * 1.8) * 0.0036;
+        cloud.position.x += 0.0014 + index * 0.0002;
+        if (cloud.position.x > 10) cloud.position.x = -10;
       });
-
-      camera.position.x += ((BASE_CAMERA_POSITION.x + mouse.x * 0.42) - camera.position.x) * 0.03;
-      camera.position.y += ((BASE_CAMERA_POSITION.y - mouse.y * 0.26) - camera.position.y) * 0.03;
-      camera.lookAt(0, 0.7, -2);
-
-      skyUniforms.mixAmount.value += (scrollProgress - skyUniforms.mixAmount.value) * SKY_TRANSITION_SPEED;
-      stars.material.opacity = 0.88 * (1 - skyUniforms.mixAmount.value * 1.3);
-      key.intensity = 1.1 + skyUniforms.mixAmount.value * 0.7;
-
-      trailHistory.unshift(plane.position.clone().add(TRAIL_OFFSET));
-      trailHistory.pop();
-      for (let i = 0; i < trailCount; i += 1) {
-        const point = trailHistory[i];
-        trailPositions[i * 3] = point.x + (Math.random() - 0.5) * 0.08;
-        trailPositions[i * 3 + 1] = point.y + (Math.random() - 0.5) * 0.08;
-        trailPositions[i * 3 + 2] = point.z + (Math.random() - 0.5) * 0.08;
-      }
-      trail.geometry.attributes.position.needsUpdate = true;
-      trail.material.opacity = 0.55 + Math.sin(t * 5) * 0.2;
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
