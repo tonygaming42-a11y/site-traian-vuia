@@ -251,8 +251,8 @@
     scene.add(groundShadow);
 
     if (window.gsap && window.ScrollTrigger) {
-      gsap.registerPlugin(ScrollTrigger);
-      ScrollTrigger.create({
+      window.gsap.registerPlugin(window.ScrollTrigger);
+      window.ScrollTrigger.create({
         trigger: hero,
         start: 'top top',
         end: 'bottom top',
