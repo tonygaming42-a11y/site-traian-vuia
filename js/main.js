@@ -170,6 +170,27 @@
     });
   }
 
+  function initJuryToggle() {
+    const btn = document.getElementById('jury-toggle');
+    const fullList = document.getElementById('jury-full');
+    if (!btn || !fullList) return;
+
+    btn.addEventListener('click', () => {
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) {
+        fullList.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.querySelector('.jury-toggle-label').textContent = 'Vezi tot juriul (22 membri) ↓';
+        document.getElementById('committees').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        fullList.style.display = 'grid';
+        btn.setAttribute('aria-expanded', 'true');
+        btn.querySelector('.jury-toggle-label').textContent = 'Restrânge juriul ↑';
+        fullList.focus();
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initLoader();
     window.initLanguageSwitcher?.();
@@ -184,6 +205,7 @@
     initTestimonials();
     initGallery();
     initForm();
+    initJuryToggle();
   });
 
   window.addEventListener('load', initThreeSceneOnLoad);
