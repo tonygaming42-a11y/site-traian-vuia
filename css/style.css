@@ -269,6 +269,8 @@ main { position: relative; z-index: 2; }
   gap: 0.4rem;
   z-index: 6;
   animation: scrollInvitePulse 2s ease-in-out infinite;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .scroll-invite-text {
