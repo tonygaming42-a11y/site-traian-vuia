@@ -192,15 +192,16 @@
     if (!btn || !list) return;
     btn.addEventListener('click', () => {
       const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const label = btn.querySelector('.toggle-label');
       if (expanded) {
         list.style.display = 'none';
         btn.setAttribute('aria-expanded', 'false');
-        btn.querySelector('.toggle-label').textContent = labelExpand;
+        if (label) label.textContent = labelExpand;
         if (sectionId) document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
         list.style.display = 'grid';
         btn.setAttribute('aria-expanded', 'true');
-        btn.querySelector('.toggle-label').textContent = labelCollapse;
+        if (label) label.textContent = labelCollapse;
       }
     });
   }
