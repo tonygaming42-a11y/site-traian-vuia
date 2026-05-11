@@ -170,23 +170,37 @@
     });
   }
 
-  function initJuryToggle() {
-    const btn = document.getElementById('jury-toggle');
-    const fullList = document.getElementById('jury-full');
-    if (!btn || !fullList) return;
+  function initCommitteesTabs() {
+    const tabs = document.querySelectorAll('.committees-tab');
+    const panels = document.querySelectorAll('.committees-panel');
+    if (!tabs.length) return;
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        panels.forEach((p) => { p.style.display = 'none'; });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        const target = document.getElementById('panel-' + tab.dataset.tab);
+        if (target) target.style.display = 'block';
+      });
+    });
+  }
 
+  function initExpandToggle(btnId, listId, sectionId, labelExpand, labelCollapse) {
+    const btn = document.getElementById(btnId);
+    const list = document.getElementById(listId);
+    if (!btn || !list) return;
     btn.addEventListener('click', () => {
-      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-      if (isExpanded) {
-        fullList.style.display = 'none';
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      if (expanded) {
+        list.style.display = 'none';
         btn.setAttribute('aria-expanded', 'false');
-        btn.querySelector('.jury-toggle-label').textContent = 'Vezi tot juriul (22 membri) ↓';
-        document.getElementById('committees').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        btn.querySelector('.toggle-label').textContent = labelExpand;
+        if (sectionId) document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
-        fullList.style.display = 'grid';
+        list.style.display = 'grid';
         btn.setAttribute('aria-expanded', 'true');
-        btn.querySelector('.jury-toggle-label').textContent = 'Restrânge juriul ↑';
-        fullList.focus();
+        btn.querySelector('.toggle-label').textContent = labelCollapse;
       }
     });
   }
@@ -205,7 +219,10 @@
     initTestimonials();
     initGallery();
     initForm();
-    initJuryToggle();
+    initCommitteesTabs();
+    initExpandToggle('jury-toggle', 'jury-full', 'committees', 'Vezi tot juriul (22 membri) ↓', 'Restrânge juriul ↑');
+    initExpandToggle('org-toggle', 'org-full', 'committees', 'Vezi tot comitetul ↓', 'Restrânge comitetul ↑');
+    initExpandToggle('testimonials-toggle', 'testimonials-full', 'testimonials', 'Vezi toate testimonialele ↓', 'Restrânge ↑');
   });
 
   window.addEventListener('load', initThreeSceneOnLoad);
