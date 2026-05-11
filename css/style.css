@@ -467,6 +467,35 @@ nav a.active {
   margin-bottom: 0.6rem;
 }
 
+.jury-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+  color: #0d0f14;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.jury-president-card {
+  border-color: var(--accent-gold) !important;
+  box-shadow: 0 0 24px rgba(201,147,58,0.18);
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.jury-president-card .jury-avatar {
+  width: 72px;
+  height: 72px;
+  font-size: 1.3rem;
+  margin: 0 auto 0.75rem;
+}
+
 .location-grid { grid-template-columns: 1fr 1.3fr; }
 
 .location-grid iframe {
