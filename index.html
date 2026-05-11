@@ -32,7 +32,7 @@
     <nav id="main-nav" aria-label="Primary navigation">
       <a href="#home" data-i18n="nav.home">Acasă</a>
       <a href="#about" data-i18n="nav.about">Despre Salon</a>
-      <a href="#committees" data-i18n="nav.committees">Juriu</a>
+      <a href="#committees" data-i18n="nav.committees">Juriu &amp; Comitet</a>
       <a href="#location" data-i18n="nav.location">Locație</a>
       <a href="#program" data-i18n="nav.program">Program</a>
       <a href="#accommodation" data-i18n="nav.accommodation">Cazare</a>
@@ -144,140 +144,265 @@
         <span class="arrival-plane">✈</span>
         <span class="arrival-line"></span>
       </div>
-      <h2 data-i18n="sections.committees.title">Juriu / Jury</h2>
-      <p data-i18n="sections.committees.intro">Juriu internațional format din experți din 10 țări, coordonat de:</p>
+      <h2>Juriu &amp; Comitet de Organizare</h2>
+      <p>Experți internaționali și echipa care face posibil Salonul Traian Vuia.</p>
 
-      <!-- President card always visible -->
-      <div class="jury-president-card glass card" style="margin-bottom:1.5rem; text-align:center; padding:2rem;">
-        <div class="jury-avatar" style="width:72px;height:72px;font-size:1.3rem;margin:0 auto 1rem;">AS</div>
-        <p style="color:var(--accent-gold);font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem;">🏅 Președinte Juriu</p>
-        <h3 data-i18n="sections.committees.president.name" style="margin-bottom:0.5rem;">DHC, Prof. Habil. Dr. Augustin SEMENESCU</h3>
-        <p data-i18n="sections.committees.president.role" style="margin:0;font-size:0.88rem;">Universitatea Națională de Știință și Tehnologie POLITEHNICA București 🇷🇴</p>
+      <!-- Tab switcher -->
+      <div class="committees-tabs" role="tablist">
+        <button class="committees-tab active" data-tab="jury" role="tab" aria-selected="true">🏅 Juriu Internațional</button>
+        <button class="committees-tab" data-tab="organizing" role="tab" aria-selected="false">🏛️ Comitet de Organizare</button>
       </div>
 
-      <!-- First 4 members always visible -->
-      <div class="grid cards-3" id="jury-preview">
-        <article class="glass card">
-          <div class="jury-avatar">MA</div>
-          <h3 data-i18n="sections.committees.member1.name">Dr. Chem. Mădălina Georgiana ALBU KAYA</h3>
-          <p data-i18n="sections.committees.member1.role">INCDTP București 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">NA</div>
-          <h3 data-i18n="sections.committees.member2.name">Prof. Najia ALZANBAGI</h3>
-          <p data-i18n="sections.committees.member2.role">King Abdulaziz University, Jeddah 🇸🇦</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">NB</div>
-          <h3 data-i18n="sections.committees.member3.name">Prof. Narcisa BĂBEANU</h3>
-          <p data-i18n="sections.committees.member3.role">USAMV București 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">CB</div>
-          <h3 data-i18n="sections.committees.member4.name">Lecturer Eng. Corneliu BIRTOK-BĂNEASĂ</h3>
-          <p data-i18n="sections.committees.member4.role">Universitatea Politehnica Timișoara 🇷🇴</p>
-        </article>
+      <!-- JURY TAB PANEL -->
+      <div class="committees-panel" id="panel-jury">
+        <!-- President card -->
+        <div class="jury-president-card glass card" style="margin-bottom:1.5rem;">
+          <div class="jury-avatar">AS</div>
+          <p class="jury-badge">🏅 Președinte Juriu</p>
+          <h3 data-i18n="sections.committees.president.name">DHC, Prof. Habil. Dr. Augustin SEMENESCU</h3>
+          <p data-i18n="sections.committees.president.role">Universitatea Națională de Știință și Tehnologie POLITEHNICA București 🇷🇴</p>
+        </div>
+
+        <!-- First 4 members always visible -->
+        <div class="grid cards-3" id="jury-preview">
+          <article class="glass card">
+            <div class="jury-avatar">MA</div>
+            <h3 data-i18n="sections.committees.member1.name">Dr. Chem. Mădălina Georgiana ALBU KAYA</h3>
+            <p data-i18n="sections.committees.member1.role">INCDTP București 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">NA</div>
+            <h3 data-i18n="sections.committees.member2.name">Prof. Najia ALZANBAGI</h3>
+            <p data-i18n="sections.committees.member2.role">King Abdulaziz University, Jeddah 🇸🇦</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">NB</div>
+            <h3 data-i18n="sections.committees.member3.name">Prof. Narcisa BĂBEANU</h3>
+            <p data-i18n="sections.committees.member3.role">USAMV București 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">CB</div>
+            <h3 data-i18n="sections.committees.member4.name">Lecturer Eng. Corneliu BIRTOK-BĂNEASĂ</h3>
+            <p data-i18n="sections.committees.member4.role">Universitatea Politehnica Timișoara 🇷🇴</p>
+          </article>
+        </div>
+
+        <!-- Remaining 18 members - hidden by default -->
+        <div class="grid cards-3 jury-expanded-list" id="jury-full" style="display:none; margin-top:1rem;">
+          <article class="glass card">
+            <div class="jury-avatar">RB</div>
+            <h3 data-i18n="sections.committees.member5.name">Prof. Radu BLAGA</h3>
+            <p data-i18n="sections.committees.member5.role">École Nationale Vétérinaire d'Alfort, Paris 🇫🇷</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">DB</div>
+            <h3 data-i18n="sections.committees.member6.name">Prof. Dorica BOTĂU</h3>
+            <p data-i18n="sections.committees.member6.role">USVT Timișoara 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">MB</div>
+            <h3 data-i18n="sections.committees.member7.name">Assoc. Prof. Mădălin BUNOIU</h3>
+            <p data-i18n="sections.committees.member7.role">Universitatea de Vest Timișoara (Prorector) 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">VC</div>
+            <h3 data-i18n="sections.committees.member8.name">Dr. Viorica CHIURCIU</h3>
+            <p data-i18n="sections.committees.member8.role">Romvac Company S.A. 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">EC</div>
+            <h3 data-i18n="sections.committees.member9.name">Prof. Eduard COROPCEANU</h3>
+            <p data-i18n="sections.committees.member9.role">Universitatea Pedagogică de Stat „Ion Creangă", Chișinău 🇲🇩</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">DD</div>
+            <h3 data-i18n="sections.committees.member10.name">HR Spec. Daniela DRAGOMIR</h3>
+            <p data-i18n="sections.committees.member10.role">OSIM România 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">KE</div>
+            <h3 data-i18n="sections.committees.member11.name">Prof. Kamel EARAR</h3>
+            <p data-i18n="sections.committees.member11.role">Universitatea „Dunărea de Jos" Galați 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">ME</div>
+            <h3 data-i18n="sections.committees.member12.name">Prof. Rer. Nat. Marius ENĂCHESCU</h3>
+            <p data-i18n="sections.committees.member12.role">POLITEHNICA București 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">IF</div>
+            <h3 data-i18n="sections.committees.member13.name">Dr. Chem. Irina FIERĂSCU</h3>
+            <p data-i18n="sections.committees.member13.role">ICECHIM București 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">RF</div>
+            <h3 data-i18n="sections.committees.member14.name">Dr. Chem. Radu Claudiu FIERĂSCU</h3>
+            <p data-i18n="sections.committees.member14.role">ICECHIM București 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">FH</div>
+            <h3 data-i18n="sections.committees.member15.name">Lecturer Eng. Florea HARITON</h3>
+            <p data-i18n="sections.committees.member15.role">Facultatea de Arte și Design, UVT 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">KI</div>
+            <h3 data-i18n="sections.committees.member16.name">Prof. Kalman IMRE</h3>
+            <p data-i18n="sections.committees.member16.role">USVT Timișoara (Prorector) 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">DK</div>
+            <h3 data-i18n="sections.committees.member17.name">Prof. Eng. Durmuș Alpaslan KAYA</h3>
+            <p data-i18n="sections.committees.member17.role">Hatay Mustafa Kemal University 🇹🇷</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">NM</div>
+            <h3 data-i18n="sections.committees.member18.name">Neven MARKOVIĆ</h3>
+            <p data-i18n="sections.committees.member18.role">INOVA, Zagreb 🇭🇷</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">LM</div>
+            <h3 data-i18n="sections.committees.member19.name">Prof. Eng. Liviu MĂRȘAVINA</h3>
+            <p data-i18n="sections.committees.member19.role">Universitatea Politehnica Timișoara (Prorector) 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">IM</div>
+            <h3 data-i18n="sections.committees.member20.name">Dr. Eng. Ileana Mariana MATEȘ</h3>
+            <p data-i18n="sections.committees.member20.role">Spitalul Militar Central „Dr. Carol Davila", București 🇷🇴</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">AM</div>
+            <h3 data-i18n="sections.committees.member21.name">Prof. Aránzazu MEANA</h3>
+            <p data-i18n="sections.committees.member21.role">Universitatea Complutense din Madrid 🇪🇸</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">OM</div>
+            <h3 data-i18n="sections.committees.member22.name">Prof. Ovidiu Alexandru MEDERLE</h3>
+            <p data-i18n="sections.committees.member22.role">USVT Timișoara 🇷🇴</p>
+          </article>
+        </div>
+
+        <!-- Toggle button -->
+        <div style="text-align:center; margin-top:1.5rem;">
+          <button class="btn btn-secondary jury-toggle-btn" id="jury-toggle" aria-expanded="false" aria-controls="jury-full">
+            <span class="toggle-label">Vezi tot juriul (22 membri) ↓</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Remaining 18 members - hidden by default -->
-      <div class="grid cards-3 jury-expanded-list" id="jury-full" style="display:none; margin-top:1rem;" tabindex="-1">
-        <article class="glass card">
-          <div class="jury-avatar">RB</div>
-          <h3 data-i18n="sections.committees.member5.name">Prof. Radu BLAGA</h3>
-          <p data-i18n="sections.committees.member5.role">École Nationale Vétérinaire d'Alfort, Paris 🇫🇷</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">DB</div>
-          <h3 data-i18n="sections.committees.member6.name">Prof. Dorica BOTĂU</h3>
-          <p data-i18n="sections.committees.member6.role">USVT Timișoara 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">MB</div>
-          <h3 data-i18n="sections.committees.member7.name">Assoc. Prof. Mădălin BUNOIU</h3>
-          <p data-i18n="sections.committees.member7.role">Universitatea de Vest Timișoara (Prorector) 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">VC</div>
-          <h3 data-i18n="sections.committees.member8.name">Dr. Viorica CHIURCIU</h3>
-          <p data-i18n="sections.committees.member8.role">Romvac Company S.A. 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">EC</div>
-          <h3 data-i18n="sections.committees.member9.name">Prof. Eduard COROPCEANU</h3>
-          <p data-i18n="sections.committees.member9.role">Universitatea Pedagogică de Stat „Ion Creangă", Chișinău 🇲🇩</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">DD</div>
-          <h3 data-i18n="sections.committees.member10.name">HR Spec. Daniela DRAGOMIR</h3>
-          <p data-i18n="sections.committees.member10.role">OSIM România 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">KE</div>
-          <h3 data-i18n="sections.committees.member11.name">Prof. Kamel EARAR</h3>
-          <p data-i18n="sections.committees.member11.role">Universitatea „Dunărea de Jos" Galați 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">ME</div>
-          <h3 data-i18n="sections.committees.member12.name">Prof. Rer. Nat. Marius ENĂCHESCU</h3>
-          <p data-i18n="sections.committees.member12.role">POLITEHNICA București 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">IF</div>
-          <h3 data-i18n="sections.committees.member13.name">Dr. Chem. Irina FIERĂSCU</h3>
-          <p data-i18n="sections.committees.member13.role">ICECHIM București 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">RF</div>
-          <h3 data-i18n="sections.committees.member14.name">Dr. Chem. Radu Claudiu FIERĂSCU</h3>
-          <p data-i18n="sections.committees.member14.role">ICECHIM București 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">FH</div>
-          <h3 data-i18n="sections.committees.member15.name">Lecturer Eng. Florea HARITON</h3>
-          <p data-i18n="sections.committees.member15.role">Facultatea de Arte și Design, UVT Timișoara 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">KI</div>
-          <h3 data-i18n="sections.committees.member16.name">Prof. Kalman IMRE</h3>
-          <p data-i18n="sections.committees.member16.role">USVT Timișoara (Prorector) 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">DK</div>
-          <h3 data-i18n="sections.committees.member17.name">Prof. Eng. Durmuș Alpaslan KAYA</h3>
-          <p data-i18n="sections.committees.member17.role">Hatay Mustafa Kemal University 🇹🇷</p>
-        </article>
-        <article class="glass card">
+      <!-- ORGANIZING COMMITTEE TAB PANEL -->
+      <div class="committees-panel" id="panel-organizing" style="display:none">
+        <!-- President card -->
+        <div class="jury-president-card glass card" style="margin-bottom:1.5rem;">
           <div class="jury-avatar">NM</div>
-          <h3 data-i18n="sections.committees.member18.name">Neven MARKOVIĆ</h3>
-          <p data-i18n="sections.committees.member18.role">INOVA, Zagreb 🇭🇷</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">LM</div>
-          <h3 data-i18n="sections.committees.member19.name">Prof. Eng. Liviu MĂRȘAVINA</h3>
-          <p data-i18n="sections.committees.member19.role">Universitatea Politehnica Timișoara (Prorector) 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">IM</div>
-          <h3 data-i18n="sections.committees.member20.name">Dr. Eng. Ileana Mariana MATEȘ</h3>
-          <p data-i18n="sections.committees.member20.role">Spitalul Militar Central „Dr. Carol Davila", București 🇷🇴</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">AM</div>
-          <h3 data-i18n="sections.committees.member21.name">Prof. Aránzazu MEANA</h3>
-          <p data-i18n="sections.committees.member21.role">Universitatea Complutense din Madrid 🇪🇸</p>
-        </article>
-        <article class="glass card">
-          <div class="jury-avatar">OM</div>
-          <h3 data-i18n="sections.committees.member22.name">Prof. Ovidiu Alexandru MEDERLE</h3>
-          <p data-i18n="sections.committees.member22.role">USVT Timișoara 🇷🇴</p>
-        </article>
-      </div>
+          <p class="jury-badge">👑 Președinte Expoziție</p>
+          <h3 data-i18n="sections.organizing.president.name">Prof. univ. dr. Narcisa MEDERLE</h3>
+          <p data-i18n="sections.organizing.president.role">Președinte al Expoziției, USVT Timișoara</p>
+        </div>
 
-      <!-- Expand/Collapse button -->
-      <div style="text-align:center; margin-top:1.5rem;">
-        <button class="btn btn-secondary jury-toggle-btn" id="jury-toggle" aria-expanded="false" aria-controls="jury-full">
-          <span class="jury-toggle-label">Vezi tot juriul (22 membri) ↓</span>
-        </button>
+        <!-- First 6 members always visible -->
+        <div class="grid cards-3" id="org-preview">
+          <article class="glass card">
+            <div class="jury-avatar">CP</div>
+            <h3 data-i18n="sections.organizing.member1.name">Prof. Eng. Cosmin Alin POPESCU</h3>
+            <p data-i18n="sections.organizing.member1.role">Rector, USVT Timișoara</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">RR</div>
+            <h3 data-i18n="sections.organizing.member2.name">Eng. Inv. Remi RĂDULESCU</h3>
+            <p data-i18n="sections.organizing.member2.role">Președinte Fondator &amp; Onorific</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">VH</div>
+            <h3 data-i18n="sections.organizing.member3.name">Prof. Viorel HERMAN</h3>
+            <p data-i18n="sections.organizing.member3.role">Președinte Senat, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">AH</div>
+            <h3 data-i18n="sections.organizing.member4.name">Prof. Adina HORABLAGA</h3>
+            <p data-i18n="sections.organizing.member4.role">Director General Administrativ, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">KI</div>
+            <h3 data-i18n="sections.organizing.member5.name">Prof. Kalman IMRE</h3>
+            <p data-i18n="sections.organizing.member5.role">Prorector, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">TI</div>
+            <h3 data-i18n="sections.organizing.member6.name">Prof. Tiberiu IANCU</h3>
+            <p data-i18n="sections.organizing.member6.role">Prorector, USVT</p>
+          </article>
+        </div>
+
+        <!-- Remaining members - hidden by default -->
+        <div class="grid cards-3" id="org-full" style="display:none; margin-top:1rem;">
+          <article class="glass card">
+            <div class="jury-avatar">DC</div>
+            <h3 data-i18n="sections.organizing.member7.name">Prof. Dorin CAMEN</h3>
+            <p data-i18n="sections.organizing.member7.role">Prorector, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">SS</div>
+            <h3 data-i18n="sections.organizing.member8.name">Prof. Sorin STANCIU</h3>
+            <p data-i18n="sections.organizing.member8.role">Prorector, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">PM</div>
+            <h3 data-i18n="sections.organizing.member9.name">Assoc. Prof. Petru MERGHEȘ</h3>
+            <p data-i18n="sections.organizing.member9.role">Director CDS, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">NH</div>
+            <h3 data-i18n="sections.organizing.member10.name">Prof. Nicoleta HĂDĂRUGĂ</h3>
+            <p data-i18n="sections.organizing.member10.role">Decan Facultatea de Agricultură</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">FI</div>
+            <h3 data-i18n="sections.organizing.member11.name">Prof. Florin IMBREA</h3>
+            <p data-i18n="sections.organizing.member11.role">Decan FEAT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">AD</div>
+            <h3 data-i18n="sections.organizing.member12.name">Prof. Alin DOBREI</h3>
+            <p data-i18n="sections.organizing.member12.role">Decan FMRT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">MC</div>
+            <h3 data-i18n="sections.organizing.member13.name">Assoc. Prof. Mariana CIOLAC</h3>
+            <p data-i18n="sections.organizing.member13.role">Decan FVM</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">SM</div>
+            <h3 data-i18n="sections.organizing.member14.name">Prof. Sorin MORARIU</h3>
+            <p data-i18n="sections.organizing.member14.role">Decan FFE</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">CJ</div>
+            <h3 data-i18n="sections.organizing.member15.name">Prof. Călin JIANU</h3>
+            <p data-i18n="sections.organizing.member15.role">Decan FBAR</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">CC</div>
+            <h3 data-i18n="sections.organizing.member16.name">Ec. Cornelia CHEȚ</h3>
+            <p data-i18n="sections.organizing.member16.role">Director Resurse Umane, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">IM2</div>
+            <h3 data-i18n="sections.organizing.member17.name">Ec. Ileana MARTON</h3>
+            <p data-i18n="sections.organizing.member17.role">Director Economic, USVT</p>
+          </article>
+          <article class="glass card">
+            <div class="jury-avatar">SH</div>
+            <h3 data-i18n="sections.organizing.member18.name">Simona HAIDUC</h3>
+            <p data-i18n="sections.organizing.member18.role">Consilier Juridic, USVT</p>
+          </article>
+        </div>
+
+        <!-- Toggle button -->
+        <div style="text-align:center; margin-top:1.5rem;">
+          <button class="btn btn-secondary jury-toggle-btn" id="org-toggle" aria-expanded="false" aria-controls="org-full">
+            <span class="toggle-label">Vezi tot comitetul ↓</span>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -354,25 +479,119 @@
     </section>
 
     <section id="testimonials" class="section">
+      <div class="section-arrival-mark" aria-hidden="true">
+        <span class="arrival-plane">✈</span>
+        <span class="arrival-line"></span>
+      </div>
       <h2 data-i18n="sections.testimonials.title">Testimoniale</h2>
+      <p>Ce spun participanții despre Salonul Traian Vuia.</p>
+
       <div class="testimonial-slider glass" id="testimonial-slider">
-        <article class="testimonial active"><p data-i18n="sections.testimonials.t1">„Un eveniment excepțional pentru inventatori.”</p><strong>Alex · RO</strong></article>
-        <article class="testimonial"><p data-i18n="sections.testimonials.t2">„Networking de nivel internațional.”</p><strong>Marie · FR</strong></article>
-        <article class="testimonial"><p data-i18n="sections.testimonials.t3">„Premii relevante și organizare impecabilă.”</p><strong>Kai · DE</strong></article>
+        <article class="testimonial active">
+          <p data-i18n="sections.testimonials.t1">„Un eveniment excepțional pentru inventatori — organizare impecabilă și networking de nivel mondial.”</p>
+          <strong>Alexandru M. · România 🇷🇴</strong>
+        </article>
+        <article class="testimonial">
+          <p data-i18n="sections.testimonials.t2">„Une occasion unique de présenter nos innovations devant un jury international de très haut niveau.”</p>
+          <strong>Marie D. · Franța 🇫🇷</strong>
+        </article>
+        <article class="testimonial">
+          <p data-i18n="sections.testimonials.t3">„Hervorragende Veranstaltung — die Preise sind international anerkannt und sehr wertvoll.”</p>
+          <strong>Kai S. · Germania 🇩🇪</strong>
+        </article>
+      </div>
+
+      <div id="testimonials-full" style="display:none; margin-top:1rem;">
+        <div class="grid cards-3">
+          <article class="glass card">
+            <p>„Salonul Traian Vuia este o platformă unică de vizibilitate internațională pentru inventatorii români.”</p>
+            <strong>Dr. Ion P. · România 🇷🇴</strong>
+          </article>
+          <article class="glass card">
+            <p>„The international jury is composed of true experts. The evaluation process is rigorous and fair.”</p>
+            <strong>Ahmed K. · Arabia Saudită 🇸🇦</strong>
+          </article>
+          <article class="glass card">
+            <p>„Excelente organización. Volveremos el próximo año con nuevas invenciones.”</p>
+            <strong>Carlos R. · Spania 🇪🇸</strong>
+          </article>
+          <article class="glass card">
+            <p>„Свидетельствую о высочайшем уровне организации и профессионализма.”</p>
+            <strong>Olga V. · Moldova 🇲🇩</strong>
+          </article>
+          <article class="glass card">
+            <p>„A must-attend event for any inventor looking to gain international recognition.”</p>
+            <strong>James W. · Marea Britanie 🇬🇧</strong>
+          </article>
+          <article class="glass card">
+            <p>„Mükemmel bir etkinlik. Jüri son derece profesyonel ve adil.”</p>
+            <strong>Mehmet Y. · Turcia 🇹🇷</strong>
+          </article>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:1.5rem;">
+        <button class="btn btn-secondary jury-toggle-btn" id="testimonials-toggle" aria-expanded="false" aria-controls="testimonials-full">
+          <span class="toggle-label">Vezi toate testimonialele ↓</span>
+        </button>
       </div>
     </section>
 
     <section id="awards" class="section">
+      <div class="section-arrival-mark" aria-hidden="true">
+        <span class="arrival-plane">✈</span>
+        <span class="arrival-line"></span>
+      </div>
       <h2 data-i18n="sections.awards.title">Premii</h2>
-      <div class="grid cards-4 hologram-grid">
-        <article class="hologram"><h3 data-i18n="awards.a1.title">🏆 Grand Prix al Expoziției</h3><p data-i18n="awards.a1.desc">Premiul suprem acordat celei mai valoroase invenții</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a2.title">🥇 Medalia de Aur</h3><p data-i18n="awards.a2.desc">Invenții de excepție cu impact ridicat</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a3.title">🥈 Medalia de Argint</h3><p data-i18n="awards.a3.desc">Invenții remarcabile cu potențial ridicat</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a4.title">🥉 Medalia de Bronz</h3><p data-i18n="awards.a4.desc">Invenții valoroase și inovatoare</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a5.title">👩‍🔬 Premiul Femeie Inventator</h3><p data-i18n="awards.a5.desc">Recunoașterea contribuției feminine în inovație</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a6.title">🌟 Premiul Tânăr Inventator</h3><p data-i18n="awards.a6.desc">Pentru inventatori sub 35 de ani</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a7.title">🎨 Premiul Best Design</h3><p data-i18n="awards.a7.desc">Cel mai inovator design tehnic</p></article>
-        <article class="hologram"><h3 data-i18n="awards.a8.title">🌍 Premii Speciale ale Organizațiilor Partenere</h3><p data-i18n="awards.a8.desc">OSIM, IFIA, asociații internaționale</p></article>
+      <p>Recunoașterea excelenței în invenție și inovație la nivel internațional.</p>
+
+      <div class="awards-tier awards-tier-1">
+        <article class="hologram awards-grand-prix">
+          <div class="award-icon">🏆</div>
+          <h3 data-i18n="awards.a1.title">Grand Prix al Expoziției</h3>
+          <p data-i18n="awards.a1.desc">Premiul suprem acordat celei mai valoroase și inovatoare invenții a ediției</p>
+        </article>
+      </div>
+
+      <div class="awards-tier awards-tier-2">
+        <article class="hologram">
+          <div class="award-icon">🥇</div>
+          <h3 data-i18n="awards.a2.title">Medalia de Aur</h3>
+          <p data-i18n="awards.a2.desc">Invenții de excepție cu impact ridicat și originalitate remarcabilă</p>
+        </article>
+        <article class="hologram">
+          <div class="award-icon">🥈</div>
+          <h3 data-i18n="awards.a3.title">Medalia de Argint</h3>
+          <p data-i18n="awards.a3.desc">Invenții remarcabile cu potențial ridicat de aplicabilitate</p>
+        </article>
+        <article class="hologram">
+          <div class="award-icon">🥉</div>
+          <h3 data-i18n="awards.a4.title">Medalia de Bronz</h3>
+          <p data-i18n="awards.a4.desc">Invenții valoroase și inovatoare cu contribuție semnificativă</p>
+        </article>
+      </div>
+
+      <div class="awards-tier awards-tier-3">
+        <article class="hologram">
+          <div class="award-icon">👩‍🔬</div>
+          <h3 data-i18n="awards.a5.title">Premiul Femeie Inventator</h3>
+          <p data-i18n="awards.a5.desc">Recunoașterea contribuției feminine în cercetare și inovație</p>
+        </article>
+        <article class="hologram">
+          <div class="award-icon">🌟</div>
+          <h3 data-i18n="awards.a6.title">Premiul Tânăr Inventator</h3>
+          <p data-i18n="awards.a6.desc">Pentru inventatori sub 35 de ani cu viziune și curaj inovativ</p>
+        </article>
+        <article class="hologram">
+          <div class="award-icon">🎨</div>
+          <h3 data-i18n="awards.a7.title">Premiul Best Design</h3>
+          <p data-i18n="awards.a7.desc">Cel mai inovator și estetic design tehnic al ediției</p>
+        </article>
+        <article class="hologram">
+          <div class="award-icon">🌍</div>
+          <h3 data-i18n="awards.a8.title">Premii Speciale Partenere</h3>
+          <p data-i18n="awards.a8.desc">Acordate de OSIM, IFIA și organizațiile internaționale partenere</p>
+        </article>
       </div>
     </section>
 
