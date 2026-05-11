@@ -93,15 +93,23 @@
       <div class="clouds" aria-hidden="true">
         <span class="cloud"></span><span class="cloud"></span><span class="cloud"></span>
       </div>
-      <div class="scroll-invite">
+      <a href="#about" class="scroll-invite" aria-label="Descoperă mai mult">
         <span class="scroll-invite-text" data-i18n="hero.scrollInvite">Descoperă</span>
         <span class="scroll-invite-arrow">↓</span>
-      </div>
+      </a>
       <div class="flight-path-connector" aria-hidden="true">
         <svg class="flight-path-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
           <path
             class="flight-path-line"
-            d="M 720 10 Q 360 60 0 110 M 720 10 Q 1080 60 1440 110"
+            d="M 720 10 Q 360 60 0 110"
+            stroke="rgba(201, 147, 58, 0.3)"
+            stroke-width="1.5"
+            fill="none"
+            stroke-dasharray="8 6"
+          />
+          <path
+            class="flight-path-line"
+            d="M 720 10 Q 1080 60 1440 110"
             stroke="rgba(201, 147, 58, 0.3)"
             stroke-width="1.5"
             fill="none"
